@@ -100,7 +100,7 @@ async function executeInsert(query, params) {
   if (connection) {
     try {
       const result = await connection.execute(query, params, { autoCommit: true });
-      return { rows: result.rows };  
+      return { rows: result.rows };
     } catch (err) {
       console.error('Error executing insert query:', err);
       return { error: err.message };
@@ -150,9 +150,22 @@ ipcMain.handle('generate-excel', async (event, nombresPartida, nombresLlegada, d
       worksheet.addRow(row);
   });
 
-  // Guardar el archivo
-  const filePath = path.join(app.getPath('downloads'), 'distancias.xlsx');
-  await workbook.xlsx.writeFile(filePath);
+  let filePath = '';
+  let index = 0;
+
+  // Intentar guardar el archivo con un nombre único
+  while (true) {
+      const archivo = index === 0 ? '' : `(${index})`;
+      filePath = path.join(app.getPath('downloads'), `distancias${archivo}.xlsx`);
+      
+      try {
+          await workbook.xlsx.writeFile(filePath);
+          break; 
+      } catch (error) {
+          console.error('Error al guardar el archivo:', error);
+          index++;
+      }
+  }
 
   return filePath;
 });

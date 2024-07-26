@@ -1,14 +1,15 @@
-let ubicaciones;
+let filteredUbicaciones;
 
 
 async function calcularDistancia() {
-    const latitudesPartida = Array.from(document.querySelectorAll('#inputs-container-partida .latitud-input'));
-    const longitudesPartida = Array.from(document.querySelectorAll('#inputs-container-partida .longitud-input'));
-    const latitudesLlegada = Array.from(document.querySelectorAll('#inputs-container-llegada .latitud-input'));
-    const longitudesLlegada = Array.from(document.querySelectorAll('#inputs-container-llegada .longitud-input'));
+    // Obtener los valores de los inputs y filtrarlos para eliminar los vacíos
+    const latitudesPartida = Array.from(document.querySelectorAll('#inputs-container-partida .latitud-input')).filter(input => input.value.trim() !== '');
+    const longitudesPartida = Array.from(document.querySelectorAll('#inputs-container-partida .longitud-input')).filter(input => input.value.trim() !== '');
+    const latitudesLlegada = Array.from(document.querySelectorAll('#inputs-container-llegada .latitud-input')).filter(input => input.value.trim() !== '');
+    const longitudesLlegada = Array.from(document.querySelectorAll('#inputs-container-llegada .longitud-input')).filter(input => input.value.trim() !== '');
 
-    const nombresPartida = Array.from(document.querySelectorAll('#inputs-container-partida .nombre')).map(input => input.value);
-    const nombresLlegada = Array.from(document.querySelectorAll('#inputs-container-llegada .nombre')).map(input => input.value);
+    const nombresPartida = Array.from(document.querySelectorAll('#inputs-container-partida .nombre')).map(input => input.value.trim()).filter(value => value !== '');
+    const nombresLlegada = Array.from(document.querySelectorAll('#inputs-container-llegada .nombre')).map(input => input.value.trim()).filter(value => value !== '');
 
     const distancias = nombresPartida.map((_, i) => {
         return nombresLlegada.map((_, j) => {
@@ -17,7 +18,7 @@ async function calcularDistancia() {
             const lat2 = parseFloat(latitudesLlegada[j].value);
             const lon2 = parseFloat(longitudesLlegada[j].value);
 
-            const R = 6371;
+            const R = 6371; // Radio de la Tierra en kilómetros
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
 
@@ -25,16 +26,17 @@ async function calcularDistancia() {
                 Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
                 Math.sin(dLon / 2) * Math.sin(dLon / 2);
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            const distancia = (R * c) * 1.25;
+            const distancia = (R * c) * 1.25; // Ajuste de factor de distancia
 
-            return Math.ceil(distancia * 100) / 100;
+            return Math.ceil(distancia * 100) / 100; // Redondeo a dos decimales
         });
     });
 
-    const filePathExcel = window.excel.createExcel(nombresPartida, nombresLlegada, distancias);
+    const filePathExcel = await window.excel.createExcel(nombresPartida, nombresLlegada, distancias);
 
     await guardarNombres(filePathExcel);
 }
+
 
 async function guardarNombres(filePathExcel) {
     const puntosPartida = document.getElementById('inputs-container-partida');
@@ -56,12 +58,12 @@ async function guardarNombres(filePathExcel) {
         const latitudPartida = latitudesPartida[i].value.trim();
         const longitudPartida = longitudesPartida[i].value.trim();
 
-        if (!nombrePartida || nombrePartida.length === 4) {
+        if (nombrePartida.length < 4) {
             continue;
         }
 
         // Verifica si el nombre es nuevo
-        const esNuevo = !ubicaciones.rows.some(item => item.NOMBRE.toLowerCase() === nombrePartida.toLowerCase());
+        const esNuevo = !filteredUbicaciones.some(item => item.NOMBRE.toLowerCase() === nombrePartida.toLowerCase());
 
         if (esNuevo) {
             datosNuevos.push({ nombre: nombrePartida, latitud: latitudPartida, longitud: longitudPartida });
@@ -74,12 +76,12 @@ async function guardarNombres(filePathExcel) {
         const latitudLlegada = latitudesLlegada[i].value.trim();
         const longitudLlegada = longitudesLlegada[i].value.trim();
 
-        if (!nombreLlegada || nombreLlegada.length === 4) {
+        if (nombreLlegada.length < 4) {
             continue;
         }
 
         // Verifica si el nombre es nuevo
-        const esNuevo = !ubicaciones.rows.some(item => item.NOMBRE.toLowerCase() === nombreLlegada.toLowerCase());
+        const esNuevo = !filteredUbicaciones.some(item => item.NOMBRE.toLowerCase() === nombreLlegada.toLowerCase());
 
         if (esNuevo) {
             datosNuevos.push({ nombre: nombreLlegada, latitud: latitudLlegada, longitud: longitudLlegada });
@@ -88,15 +90,16 @@ async function guardarNombres(filePathExcel) {
 
     if (datosNuevos.length > 0) {
         const insertQuery = `INSERT INTO ubicaciones (nombre, latitud, longitud) VALUES (:nombre, :latitud, :longitud)`;
+        console.log(datosNuevos);
         try {
             for (const dato of datosNuevos) {
                 const result = await window.electronAPI.insertDatabase(insertQuery, [dato.nombre, dato.latitud, dato.longitud]);
                 if (result.error) {
                     console.error('Error en la inserción:', result.error);
-                } else {
-                    alert('Los datos nuevos han sido guardados exitosamente en la carpeta: ' + filePathExcel);
                 }
             }
+
+            alert('Los datos nuevos han sido guardados exitosamente en la carpeta: ' + filePathExcel);
         } catch (error) {
             console.error('Error al realizar la consulta:', error);
         }
@@ -104,7 +107,6 @@ async function guardarNombres(filePathExcel) {
         console.log('No hay datos nuevos para insertar.');
     }
 }
-
 
 function addNewInput(idContainer) {
     const container = document.getElementById(idContainer);
@@ -188,7 +190,7 @@ async function buscarDatos(input, idContainer) {
     const nombresSet = new Set([...nombresLlegada, ...nombresPartida]);
     const nombres = Array.from(nombresSet);
 
-    const query = `SELECT * FROM ubicaciones WHERE nombre LIKE '%${input.value}%' AND ROWNUM <= 5`;
+    const query = `SELECT * FROM ubicaciones WHERE nombre LIKE '%${input.value}%'`;
 
     try {
         const ubicaciones = await window.electronAPI.selectDatabase(query);
@@ -202,7 +204,8 @@ async function buscarDatos(input, idContainer) {
 
                 // Usa un Set para eliminar duplicados en ubicaciones.rows basado en NOMBRE
                 const ubicacionesSet = new Set();
-                const filteredUbicaciones = ubicaciones.rows.filter(item => {
+
+                filteredUbicaciones = ubicaciones.rows.filter(item => {
                     const nombreLower = item.NOMBRE.toLowerCase();
                     if (ubicacionesSet.has(nombreLower) || nombres.includes(nombreLower)) {
                         return false;
