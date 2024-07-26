@@ -1,5 +1,11 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
+contextBridge.exposeInMainWorld('excel', {
+    createExcel: async (nombresPartida, nombresLlegada, distancias) => {
+        return await ipcRenderer.invoke('generate-excel', nombresPartida, nombresLlegada, distancias);
+    }
+});
+
 contextBridge.exposeInMainWorld('electronAPI', {
     selectDatabase: async (query) => {
         try {

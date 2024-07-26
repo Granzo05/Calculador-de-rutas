@@ -2,6 +2,7 @@ const { app, BrowserWindow, screen: electronScreen, ipcMain } = require('electro
 const path = require('path');
 const oracledb = require('oracledb');
 require('dotenv').config();
+const ExcelJS = require('exceljs');
 
 // Configuración del cliente Oracle
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
@@ -28,17 +29,13 @@ const createWindow = () => {
     },
   });
 
-  if (process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL) {
-    mainWindow.loadURL(process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL);
-  } else {
-    mainWindow.loadFile(path.join(__dirname, './index.html'));
-  }
+  mainWindow.loadFile(path.join(__dirname, './index.html'));
 
   mainWindow.webContents.openDevTools();
 };
 
 app.on('ready', async () => {
-  //await connectToDatabase();
+  await connectToDatabase();
   createWindow();
 });
 
@@ -137,4 +134,25 @@ app.on('before-quit', async () => {
       console.error('Error al cerrar la conexión a la base de datos:', err);
     }
   }
+});
+
+ipcMain.handle('generate-excel', async (event, nombresPartida, nombresLlegada, distancias) => {
+  const workbook = new ExcelJS.Workbook();
+  const worksheet = workbook.addWorksheet('Distancias');
+
+  worksheet.addRow(['Nombres', ...nombresLlegada]);
+
+  nombresPartida.forEach((nombrePartida, i) => {
+      const row = [nombrePartida];
+      nombresLlegada.forEach((_, j) => {
+          row.push(parseInt(distancias[i][j]));
+      });
+      worksheet.addRow(row);
+  });
+
+  // Guardar el archivo
+  const filePath = path.join(app.getPath('downloads'), 'distancias.xlsx');
+  await workbook.xlsx.writeFile(filePath);
+
+  return filePath;
 });

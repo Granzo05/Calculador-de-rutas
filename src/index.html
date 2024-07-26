@@ -13,19 +13,22 @@
         <p>Puntos de partida</p>
         <div id="inputs-container-partida">
             <span class="inputs-container">
-                <input type="text" class="nombre" oninput="buscarDatos(this)" placeholder="Nombre o número..." />
+                <input type="text" class="nombre" oninput="buscarDatos(this, 'inputs-container-partida')"
+                    placeholder="Nombre o número..." />
                 <div class="results-container" id="results-container-partida-1"></div>
                 <input type="text" class="latitud-input" placeholder="Latitud..." />
-                <input type="text" class="longitud-input" placeholder="Longitud..." />
+                <input type="text" class="longitud-input" oninput="handleInput(this, 'inputs-container-partida')"
+                    placeholder="Longitud..." />
             </span>
         </div>
         <p>Puntos de llegada</p>
         <div id="inputs-container-llegada">
             <span class="inputs-container">
-                <input type="text" class="nombre" oninput="buscarDatos(this)" placeholder="Nombre o número..." />
+                <input type="text" class="nombre" oninput="buscarDatos(this, 'inputs-container-llegada')"
+                    placeholder="Nombre o número..." />
                 <div class="results-container" id="results-container-llegada-1"></div>
                 <input type="text" class="latitud-input" placeholder="Latitud..." />
-                <input type="text" class="longitud-input" placeholder="Longitud..." />
+                <input type="text" class="longitud-input" oninput="handleInput(this, 'inputs-container-llegada')" placeholder="Longitud..." />
             </span>
         </div>
     </div>

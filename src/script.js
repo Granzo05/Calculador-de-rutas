@@ -1,25 +1,23 @@
 let ubicaciones;
 
+
 async function calcularDistancia() {
-    const puntosPartida = document.getElementById('inputs-container-partida');
-    const puntosLlegada = document.getElementById('inputs-container-llegada');
+    const latitudesPartida = Array.from(document.querySelectorAll('#inputs-container-partida .latitud-input'));
+    const longitudesPartida = Array.from(document.querySelectorAll('#inputs-container-partida .longitud-input'));
+    const latitudesLlegada = Array.from(document.querySelectorAll('#inputs-container-llegada .latitud-input'));
+    const longitudesLlegada = Array.from(document.querySelectorAll('#inputs-container-llegada .longitud-input'));
 
-    const latitudesPartida = puntosPartida?.getElementsByClassName('latitud-input');
-    const longitudesPartida = puntosPartida?.getElementsByClassName('longitud-input');
+    const nombresPartida = Array.from(document.querySelectorAll('#inputs-container-partida .nombre')).map(input => input.value);
+    const nombresLlegada = Array.from(document.querySelectorAll('#inputs-container-llegada .nombre')).map(input => input.value);
 
-    const latitudesLlegada = puntosLlegada?.getElementsByClassName('latitud-input');
-    const longitudesLlegada = puntosLlegada?.getElementsByClassName('longitud-input');
-
-    // Radio de la Tierra en kilómetros
-    const R = 6371;
-
-    for (let i = 0; i < latitudesPartida.length; i++) {
-        for (let j = 0; j < latitudesLlegada.length; j++) {
+    const distancias = nombresPartida.map((_, i) => {
+        return nombresLlegada.map((_, j) => {
             const lat1 = parseFloat(latitudesPartida[i].value);
             const lon1 = parseFloat(longitudesPartida[i].value);
             const lat2 = parseFloat(latitudesLlegada[j].value);
             const lon2 = parseFloat(longitudesLlegada[j].value);
 
+            const R = 6371;
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
 
@@ -29,14 +27,16 @@ async function calcularDistancia() {
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
             const distancia = (R * c) * 1.25;
 
-            console.log(`Distancia de ${i + 1} a ${j + 1}: ${Math.ceil(distancia * 100) / 100} km`);
-        }
-    }
+            return Math.ceil(distancia * 100) / 100;
+        });
+    });
 
-    await guardarNombres();
+    const filePathExcel = window.excel.createExcel(nombresPartida, nombresLlegada, distancias);
+
+    await guardarNombres(filePathExcel);
 }
 
-async function guardarNombres() {
+async function guardarNombres(filePathExcel) {
     const puntosPartida = document.getElementById('inputs-container-partida');
     const puntosLlegada = document.getElementById('inputs-container-llegada');
 
@@ -95,7 +95,7 @@ async function guardarNombres() {
                 if (result.error) {
                     console.error('Error en la inserción:', result.error);
                 } else {
-                    alert('Los datos nuevos han sido guardados exitosamente');
+                    alert('Los datos nuevos han sido guardados exitosamente en la carpeta: ' + filePathExcel);
                 }
             }
         } catch (error) {
@@ -107,93 +107,78 @@ async function guardarNombres() {
 
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    const containerPartida = document.getElementById('inputs-container-partida');
-    const containerLlegada = document.getElementById('inputs-container-llegada');
+function addNewInput(idContainer) {
+    const container = document.getElementById(idContainer);
 
-    function addNewInput(container, prefix) {
-        if (container) {
-            // Obtener todos los campos en el contenedor
-            const allInputs = Array.from(container.querySelectorAll('.longitud-input'));
-            const lastInput = allInputs[allInputs.length - 1];
+    if (container) {
+        // Obtener todos los campos en el contenedor
+        const allInputs = Array.from(container.querySelectorAll('.longitud-input'));
+        const lastInput = allInputs[allInputs.length - 1];
 
-            // Verificar si el último campo está vacío y no se ha creado un nuevo campo después
-            if (lastInput && lastInput.value.trim() === '') {
-                return;
-            }
-
-            const hr = document.createElement('hr');
-
-            const newNombre = document.createElement('input');
-            newNombre.type = 'text';
-            newNombre.className = 'nombre';
-            newNombre.placeholder = 'Nombre o número...';
-            newNombre.oninput = function () { buscarDatos(this) };
-
-            const divResultados = document.createElement('div');
-            divResultados.className = 'results-container';
-
-            const newInputLatitud = document.createElement('input');
-            newInputLatitud.type = 'text';
-            newInputLatitud.className = 'latitud-input';
-            newInputLatitud.placeholder = 'Latitud...';
-
-            const newInputLongitud = document.createElement('input');
-            newInputLongitud.type = 'text';
-            newInputLongitud.className = 'longitud-input';
-            newInputLongitud.placeholder = 'Longitud...';
-
-            const borrar = document.createElement('span');
-            borrar.innerHTML = `x`;
-            borrar.className = 'borrar';
-            borrar.onclick = () => {
-                container.removeChild(hr);
-                container.removeChild(span);
-            };
-
-            const span = document.createElement('span');
-            span.className = 'inputs-container';
-
-            // Añadir el nuevo campo de entrada al contenedor
-            span.appendChild(newNombre);
-            span.appendChild(divResultados);
-            span.appendChild(newInputLatitud);
-            span.appendChild(newInputLongitud);
-            span.appendChild(borrar);
-
-            container.appendChild(hr);
-            container.appendChild(span);
-
-            newInputLatitud.addEventListener('input', handleInput);
-            newInputLongitud.addEventListener('input', handleInput);
+        // Verificar si el último campo está vacío y no se ha creado un nuevo campo después
+        if (lastInput && lastInput.value.trim() === '') {
+            return;
         }
+
+        const hr = document.createElement('hr');
+
+        const newNombre = document.createElement('input');
+        newNombre.type = 'text';
+        newNombre.className = 'nombre';
+        newNombre.placeholder = 'Nombre o número...';
+        newNombre.oninput = function () { buscarDatos(this) };
+
+        const divResultados = document.createElement('div');
+        divResultados.className = 'results-container';
+
+        const newInputLatitud = document.createElement('input');
+        newInputLatitud.type = 'text';
+        newInputLatitud.className = 'latitud-input';
+        newInputLatitud.placeholder = 'Latitud...';
+
+        const newInputLongitud = document.createElement('input');
+        newInputLongitud.type = 'text';
+        newInputLongitud.className = 'longitud-input';
+        newInputLongitud.placeholder = 'Longitud...';
+
+        const borrar = document.createElement('span');
+        borrar.innerHTML = `x`;
+        borrar.className = 'borrar';
+        borrar.onclick = () => {
+            container.removeChild(hr);
+            container.removeChild(span);
+        };
+
+        const span = document.createElement('span');
+        span.className = 'inputs-container';
+
+        // Añadir el nuevo campo de entrada al contenedor
+        span.appendChild(newNombre);
+        span.appendChild(divResultados);
+        span.appendChild(newInputLatitud);
+        span.appendChild(newInputLongitud);
+        span.appendChild(borrar);
+
+        container.appendChild(hr);
+        container.appendChild(span);
+
+        newInputLongitud.addEventListener('input', () => {
+            handleInput(newInputLongitud, idContainer)
+        });
     }
+}
 
-    function handleInput(event) {
-        if (event.target.value.trim().length >= 1) {
-            const container = event.target.closest('.inputs-container');
-            if (container) {
-                const prefix = container.closest('#inputs-container-partida') ? 'partida' : 'llegada';
-                addNewInput(
-                    prefix === 'partida' ? containerPartida : containerLlegada,
-                    prefix
-                );
-            }
-        }
+function handleInput(event, idContainer) {
+    if (event.value.trim().length >= 1) {
+        addNewInput(
+            idContainer
+        );
     }
-
-    // Añadir eventos a los inputs existentes en el contenedor de partida
-    const longitudPartida = containerPartida.querySelectorAll('.longitud-input');
-    longitudPartida.forEach(input => input.addEventListener('input', handleInput));
-
-    // Añadir eventos a los inputs existentes en el contenedor de llegada
-    const longitudLlegada = containerLlegada.querySelectorAll('.longitud-input');
-    longitudLlegada.forEach(input => input.addEventListener('input', handleInput));
-});
+}
 
 // Resultados
 
-async function buscarDatos(input) {
+async function buscarDatos(input, idContainer) {
     const query = `SELECT * FROM ubicaciones WHERE nombre LIKE '${input.value}%' AND ROWNUM <= 5`;
     try {
         ubicaciones = await window.electronAPI.selectDatabase(query);
@@ -207,6 +192,7 @@ async function buscarDatos(input) {
 
                 // Accede a los valores de NOMBRE correctamente
                 const filteredData = ubicaciones.rows.filter(item => item.NOMBRE.toLowerCase().includes(input.value.toLowerCase()));
+
                 const latitudInput = input.parentElement.querySelector('.latitud-input');
 
                 const longitudInput = input.parentElement.querySelector('.longitud-input');
@@ -221,6 +207,7 @@ async function buscarDatos(input) {
                         latitudInput.value = item.LATITUD;
                         longitudInput.value = item.LONGITUD;
                         resultsContainer.innerHTML = '';
+                        addNewInput(idContainer);
                     });
 
                     resultsContainer.appendChild(resultItem);
