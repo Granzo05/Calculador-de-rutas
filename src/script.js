@@ -202,33 +202,48 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Resultados
 
-const data = ['John Doe', 'Jane Smith', 'Mike Johnson', 'Anna Brown', 'Paul Wilson'];
+async function buscarDatos(input) {
+    const query = `SELECT * FROM ubicaciones WHERE nombre LIKE '${input.value}%' AND ROWNUM <= 10`;
+    try {
+        const result = await window.electronAPI.selectDatabase(query);
 
-function buscarDatos(input) {
-    const query = input.value.toLowerCase();
-    const resultsContainer = input.nextElementSibling;
-    resultsContainer.innerHTML = '';
+        if (result.error) {
+            console.error('Error en la consulta:', result.error);
+        } else {
+            if (result.rows && result.rows.length > 0) {
+                const resultsContainer = input.nextElementSibling;
+                resultsContainer.innerHTML = '';
 
-    if (query) {
-        const filteredData = data.filter(item => item.toLowerCase().includes(query));
+                // Accede a los valores de NOMBRE correctamente
+                const filteredData = result.rows.filter(item => item.NOMBRE.toLowerCase().includes(input.value.toLowerCase()));
+                const latitudInput = input.parentElement.querySelector('.latitud-input');
 
-        filteredData.forEach(item => {
-            const resultItem = document.createElement('div');
-            resultItem.className = 'result-item';
-            resultItem.textContent = item;
+                const longitudInput = input.parentElement.querySelector('.longitud-input');
+        
+                filteredData.forEach(item => {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'result-item';
+                    resultItem.textContent = item.NOMBRE;
 
-            // Agregar evento para seleccionar el item
-            resultItem.addEventListener('click', () => {
-                input.value = item; // Rellenar el input con el valor seleccionado
-                resultsContainer.innerHTML = ''; // Limpiar los resultados
-            });
+                    resultItem.addEventListener('click', () => {
+                        input.value = item.NOMBRE;
+                        latitudInput.value = item.LATITUD;
+                        longitudInput.value = item.LONGITUD;
+                        resultsContainer.innerHTML = ''; 
+                    });
 
-            resultsContainer.appendChild(resultItem);
-        });
+                    resultsContainer.appendChild(resultItem);
+                });
 
-        resultsContainer.style.display = filteredData.length ? 'block' : 'none';
-    } else {
-        resultsContainer.style.display = 'none';
+                resultsContainer.style.display = filteredData.length ? 'block' : 'none';
+            } else {
+                const resultsContainer = input.nextElementSibling;
+                resultsContainer.innerHTML = '';
+                resultsContainer.style.display = 'none';
+            }
+        }
+    } catch (error) {
+        console.error('Error al realizar la consulta:', error);
     }
 }
 
@@ -240,3 +255,21 @@ document.addEventListener('click', (event) => {
         }
     });
 });
+
+/*
+  const insertQuery = `INSERT INTO usuario (usuario, contraseña, rol) VALUES ('${user}', '${hashedPassword}', '${rol}')`;
+
+  try {
+    const result: any = await window.electronAPI.insertDatabase(insertQuery);
+    if (result.error) {
+      console.error('Error en la consulta:', result.error);
+      showToast(`Error en la consulta: ${result.error}`);
+    } else {
+      showToast('Usuario cargado con éxito');
+      console.log('Inserción exitosa:', result);
+    }
+  } catch (error) {
+    console.error('Error al realizar la consulta:', error);
+    showToast(`Error al realizar la consulta: ${error}`);
+  }
+*/

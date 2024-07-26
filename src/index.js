@@ -38,8 +38,8 @@ const createWindow = () => {
 };
 
 app.on('ready', async () => {
-  createWindow();
   await connectToDatabase();
+  createWindow();
 });
 
 app.on('window-all-closed', async () => {
