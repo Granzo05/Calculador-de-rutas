@@ -56,8 +56,8 @@ async function guardarNombres(filePathExcel) {
         const latitudPartida = latitudesPartida[i].value.trim();
         const longitudPartida = longitudesPartida[i].value.trim();
 
-        if (nombrePartida.length === 4) {
-            break;
+        if (!nombrePartida || nombrePartida.length === 4) {
+            continue;
         }
 
         // Verifica si el nombre es nuevo
@@ -74,8 +74,8 @@ async function guardarNombres(filePathExcel) {
         const latitudLlegada = latitudesLlegada[i].value.trim();
         const longitudLlegada = longitudesLlegada[i].value.trim();
 
-        if (nombreLlegada.length === 4) {
-            break;
+        if (!nombreLlegada || nombreLlegada.length === 4) {
+            continue;
         }
 
         // Verifica si el nombre es nuevo
@@ -86,7 +86,7 @@ async function guardarNombres(filePathExcel) {
         }
     }
 
-    if (datosNuevos.length > 1) {
+    if (datosNuevos.length > 0) {
         const insertQuery = `INSERT INTO ubicaciones (nombre, latitud, longitud) VALUES (:nombre, :latitud, :longitud)`;
         console.log(datosNuevos)
         try {
@@ -104,8 +104,8 @@ async function guardarNombres(filePathExcel) {
     } else {
         console.log('No hay datos nuevos para insertar.');
     }
-
 }
+
 
 function addNewInput(idContainer) {
     const container = document.getElementById(idContainer);
@@ -179,22 +179,32 @@ function handleInput(event, idContainer) {
 // Resultados
 
 async function buscarDatos(input, idContainer) {
+    const puntosPartida = document.getElementById('inputs-container-partida');
+    const puntosLlegada = document.getElementById('inputs-container-llegada');
+    
+    // Obtenemos los nombres de partida y llegada y los convertimos en arrays de valores
+    const nombresPartida = Array.from(puntosPartida?.getElementsByClassName('nombre') || []).map(input => input.value.trim().toLowerCase());
+    const nombresLlegada = Array.from(puntosLlegada?.getElementsByClassName('nombre') || []).map(input => input.value.trim().toLowerCase());
+    
+    // Combinamos los arrays de nombres de partida y llegada
+    const nombres = [...nombresLlegada, ...nombresPartida];
+    
     const query = `SELECT * FROM ubicaciones WHERE nombre LIKE '${input.value}%' AND ROWNUM <= 5`;
     try {
         ubicaciones = await window.electronAPI.selectDatabase(query);
 
         if (ubicaciones.error) {
-            console.error('Error en la consulta:', result.error);
+            console.error('Error en la consulta:', ubicaciones.error);
         } else {
             if (ubicaciones.rows && ubicaciones.rows.length > 0) {
                 const resultsContainer = input.nextElementSibling;
                 resultsContainer.innerHTML = '';
 
-                // Accede a los valores de NOMBRE correctamente
-                const filteredData = ubicaciones.rows.filter(item => item.NOMBRE.toLowerCase().includes(input.value.toLowerCase()));
-
+                // Filtrar los resultados para excluir los nombres ya presentes en los inputs
+                const filteredData = ubicaciones.rows.filter(item => !nombres.includes(item.NOMBRE));
+                console.log(ubicaciones)
+                console.log(nombres)
                 const latitudInput = input.parentElement.querySelector('.latitud-input');
-
                 const longitudInput = input.parentElement.querySelector('.longitud-input');
 
                 filteredData.forEach(item => {
