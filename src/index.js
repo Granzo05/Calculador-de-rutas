@@ -38,7 +38,7 @@ const createWindow = () => {
 };
 
 app.on('ready', async () => {
-  await connectToDatabase();
+  //await connectToDatabase();
   createWindow();
 });
 
