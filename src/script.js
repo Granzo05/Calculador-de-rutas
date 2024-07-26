@@ -18,7 +18,7 @@ async function calcularDistancia() {
             const lat2 = parseFloat(latitudesLlegada[j].value);
             const lon2 = parseFloat(longitudesLlegada[j].value);
 
-            const R = 6371; // Radio de la Tierra en kilómetros
+            const R = 6371; 
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
 
@@ -26,9 +26,9 @@ async function calcularDistancia() {
                 Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
                 Math.sin(dLon / 2) * Math.sin(dLon / 2);
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            const distancia = (R * c) * 1.25; // Ajuste de factor de distancia
+            const distancia = (R * c) * 1.15; 
 
-            return Math.ceil(distancia * 100) / 100; // Redondeo a dos decimales
+            return Math.ceil(distancia * 100) / 100; 
         });
     });
 
