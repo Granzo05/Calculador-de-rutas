@@ -88,7 +88,6 @@ async function guardarNombres(filePathExcel) {
 
     if (datosNuevos.length > 0) {
         const insertQuery = `INSERT INTO ubicaciones (nombre, latitud, longitud) VALUES (:nombre, :latitud, :longitud)`;
-        console.log(datosNuevos)
         try {
             for (const dato of datosNuevos) {
                 const result = await window.electronAPI.insertDatabase(insertQuery, [dato.nombre, dato.latitud, dato.longitud]);
@@ -181,17 +180,18 @@ function handleInput(event, idContainer) {
 async function buscarDatos(input, idContainer) {
     const puntosPartida = document.getElementById('inputs-container-partida');
     const puntosLlegada = document.getElementById('inputs-container-llegada');
-    
-    // Obtenemos los nombres de partida y llegada y los convertimos en arrays de valores
+
     const nombresPartida = Array.from(puntosPartida?.getElementsByClassName('nombre') || []).map(input => input.value.trim().toLowerCase());
     const nombresLlegada = Array.from(puntosLlegada?.getElementsByClassName('nombre') || []).map(input => input.value.trim().toLowerCase());
-    
-    // Combinamos los arrays de nombres de partida y llegada
-    const nombres = [...nombresLlegada, ...nombresPartida];
-    
+
+    // Combina los nombres y elimina duplicados
+    const nombresSet = new Set([...nombresLlegada, ...nombresPartida]);
+    const nombres = Array.from(nombresSet);
+
     const query = `SELECT * FROM ubicaciones WHERE nombre LIKE '${input.value}%' AND ROWNUM <= 5`;
+
     try {
-        ubicaciones = await window.electronAPI.selectDatabase(query);
+        const ubicaciones = await window.electronAPI.selectDatabase(query);
 
         if (ubicaciones.error) {
             console.error('Error en la consulta:', ubicaciones.error);
@@ -200,14 +200,21 @@ async function buscarDatos(input, idContainer) {
                 const resultsContainer = input.nextElementSibling;
                 resultsContainer.innerHTML = '';
 
-                // Filtrar los resultados para excluir los nombres ya presentes en los inputs
-                const filteredData = ubicaciones.rows.filter(item => !nombres.includes(item.NOMBRE));
-                console.log(ubicaciones)
-                console.log(nombres)
+                // Usa un Set para eliminar duplicados en ubicaciones.rows basado en NOMBRE
+                const ubicacionesSet = new Set();
+                const filteredUbicaciones = ubicaciones.rows.filter(item => {
+                    const nombreLower = item.NOMBRE.toLowerCase();
+                    if (ubicacionesSet.has(nombreLower) || nombres.includes(nombreLower)) {
+                        return false;
+                    }
+                    ubicacionesSet.add(nombreLower);
+                    return true;
+                });
+
                 const latitudInput = input.parentElement.querySelector('.latitud-input');
                 const longitudInput = input.parentElement.querySelector('.longitud-input');
 
-                filteredData.forEach(item => {
+                filteredUbicaciones.forEach(item => {
                     const resultItem = document.createElement('div');
                     resultItem.className = 'result-item';
                     resultItem.textContent = item.NOMBRE;
@@ -223,7 +230,7 @@ async function buscarDatos(input, idContainer) {
                     resultsContainer.appendChild(resultItem);
                 });
 
-                resultsContainer.style.display = filteredData.length ? 'block' : 'none';
+                resultsContainer.style.display = filteredUbicaciones.length ? 'block' : 'none';
             } else {
                 const resultsContainer = input.nextElementSibling;
                 resultsContainer.innerHTML = '';
@@ -234,6 +241,7 @@ async function buscarDatos(input, idContainer) {
         console.error('Error al realizar la consulta:', error);
     }
 }
+
 
 document.addEventListener('click', (event) => {
     const resultsContainers = document.querySelectorAll('.results-container');
