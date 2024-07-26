@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <title>Calculador</title>
+</head>
+
+<body>
+    <div class="container">
+        <p>Puntos de partida</p>
+        <div id="inputs-container-partida">
+            <p>Lugar 1</p>
+            <span class="inputs-container">
+                <input type="text" class="nombre" oninput="buscarDatos(this)" placeholder="Nombre o número..." />
+                <div class="results-container" id="results-container-partida-1"></div>
+                <input type="text" class="latitud-input" placeholder="Latitud..." />
+                <input type="text" class="longitud-input" placeholder="Longitud..." />
+            </span>
+
+        </div>
+        <p>Puntos de llegada</p>
+        <div id="inputs-container-llegada">
+            <p>Lugar 1</p>
+            <span class="inputs-container">
+                <input type="text" class="nombre" oninput="buscarDatos(this)" placeholder="Nombre o número..." />
+                <div class="results-container" id="results-container-llegada-1"></div>
+                <input type="text" class="latitud-input" placeholder="Latitud..." />
+                <input type="text" class="longitud-input" placeholder="Longitud..." />
+            </span>
+        </div>
+
+    </div>
+    <button class="black-button" onclick="calcularDistancia()">Calcular distancia</button>
+
+    <script src="./script.js"></script>
+</body>
+
+</html>
