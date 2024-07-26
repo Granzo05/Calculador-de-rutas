@@ -1,4 +1,6 @@
-function calcularDistancia() {
+let ubicaciones;
+
+async function calcularDistancia() {
     const puntosPartida = document.getElementById('inputs-container-partida');
     const puntosLlegada = document.getElementById('inputs-container-llegada');
 
@@ -25,12 +27,86 @@ function calcularDistancia() {
                 Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
                 Math.sin(dLon / 2) * Math.sin(dLon / 2);
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            const distancia = R * c;
+            const distancia = (R * c) * 1.25;
 
             console.log(`Distancia de ${i + 1} a ${j + 1}: ${distancia.toFixed(2)} km`);
         }
     }
+
+    await guardarNombres();
 }
+
+async function guardarNombres() {
+    const puntosPartida = document.getElementById('inputs-container-partida');
+    const puntosLlegada = document.getElementById('inputs-container-llegada');
+
+    const nombresPartida = Array.from(puntosPartida?.getElementsByClassName('nombre') || []);
+    const latitudesPartida = Array.from(puntosPartida?.getElementsByClassName('latitud-input') || []);
+    const longitudesPartida = Array.from(puntosPartida?.getElementsByClassName('longitud-input') || []);
+
+    const nombresLlegada = Array.from(puntosLlegada?.getElementsByClassName('nombre') || []);
+    const latitudesLlegada = Array.from(puntosLlegada?.getElementsByClassName('latitud-input') || []);
+    const longitudesLlegada = Array.from(puntosLlegada?.getElementsByClassName('longitud-input') || []);
+
+    let datosNuevos = [];
+
+    // Recopilar datos de partida
+    for (let i = 0; i < nombresPartida.length; i++) {
+        const nombrePartida = nombresPartida[i].value.trim();
+        const latitudPartida = latitudesPartida[i].value.trim();
+        const longitudPartida = longitudesPartida[i].value.trim();
+
+        if (nombrePartida.length === 4) {
+            break;
+        }
+
+        // Verifica si el nombre es nuevo
+        const esNuevo = !ubicaciones.rows.some(item => item.NOMBRE.toLowerCase() === nombrePartida.toLowerCase());
+
+        if (esNuevo) {
+            datosNuevos.push({ nombre: nombrePartida, latitud: latitudPartida, longitud: longitudPartida });
+        }
+    }
+
+    // Recopilar datos de llegada
+    for (let i = 0; i < nombresLlegada.length; i++) {
+        const nombreLlegada = nombresLlegada[i].value.trim();
+        const latitudLlegada = latitudesLlegada[i].value.trim();
+        const longitudLlegada = longitudesLlegada[i].value.trim();
+
+        if (nombreLlegada.length === 4) {
+            break;
+        }
+
+        // Verifica si el nombre es nuevo
+        const esNuevo = !ubicaciones.rows.some(item => item.NOMBRE.toLowerCase() === nombreLlegada.toLowerCase());
+
+        if (esNuevo) {
+            datosNuevos.push({ nombre: nombreLlegada, latitud: latitudLlegada, longitud: longitudLlegada });
+        }
+    }
+
+    if (datosNuevos.length > 1) {
+        const insertQuery = `INSERT INTO ubicaciones (nombre, latitud, longitud) VALUES (:nombre, :latitud, :longitud)`;
+        console.log(datosNuevos)
+        try {
+            for (const dato of datosNuevos) {
+                const result = await window.electronAPI.insertDatabase(insertQuery, [dato.nombre, dato.latitud, dato.longitud]);
+                if (result.error) {
+                    console.error('Error en la inserción:', result.error);
+                } else {
+                    alert('Los datos nuevos han sido guardados exitosamente');
+                }
+            }
+        } catch (error) {
+            console.error('Error al realizar la consulta:', error);
+        }
+    } else {
+        console.log('No hay datos nuevos para insertar.');
+    }
+
+}
+
 
 let indexPartida = 2;
 let indexLlegada = 2;
@@ -39,9 +115,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('inputs-container-partida');
 
     function addNewInput() {
-        // Obtener todos los campos en el contenedor
         if (container) {
-
+            // Obtener todos los campos en el contenedor
             const allInputs = Array.from(container.querySelectorAll('.longitud-input'));
             const lastInput = allInputs[allInputs.length - 1];
 
@@ -78,8 +153,9 @@ document.addEventListener('DOMContentLoaded', () => {
             borrar.innerHTML = `x`;
             borrar.className = 'borrar';
             borrar.onclick = () => {
+                container.removeChild(p);
                 container.removeChild(span);
-                indexLlegada--;
+                indexPartida--;
             };
 
             const span = document.createElement('span');
@@ -99,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
             newInputLatitud.addEventListener('input', handleInput);
             newInputLongitud.addEventListener('input', handleInput);
 
-            indexLlegada++;
+            indexPartida++;
         }
     }
 
@@ -160,6 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
             borrar.innerHTML = `x`;
             borrar.className = 'borrar';
             borrar.onclick = () => {
+                container.removeChild(p);
                 container.removeChild(span);
                 indexLlegada--;
             };
@@ -205,21 +282,21 @@ document.addEventListener('DOMContentLoaded', () => {
 async function buscarDatos(input) {
     const query = `SELECT * FROM ubicaciones WHERE nombre LIKE '${input.value}%' AND ROWNUM <= 10`;
     try {
-        const result = await window.electronAPI.selectDatabase(query);
+        ubicaciones = await window.electronAPI.selectDatabase(query);
 
-        if (result.error) {
+        if (ubicaciones.error) {
             console.error('Error en la consulta:', result.error);
         } else {
-            if (result.rows && result.rows.length > 0) {
+            if (ubicaciones.rows && ubicaciones.rows.length > 0) {
                 const resultsContainer = input.nextElementSibling;
                 resultsContainer.innerHTML = '';
 
                 // Accede a los valores de NOMBRE correctamente
-                const filteredData = result.rows.filter(item => item.NOMBRE.toLowerCase().includes(input.value.toLowerCase()));
+                const filteredData = ubicaciones.rows.filter(item => item.NOMBRE.toLowerCase().includes(input.value.toLowerCase()));
                 const latitudInput = input.parentElement.querySelector('.latitud-input');
 
                 const longitudInput = input.parentElement.querySelector('.longitud-input');
-        
+
                 filteredData.forEach(item => {
                     const resultItem = document.createElement('div');
                     resultItem.className = 'result-item';
@@ -229,7 +306,7 @@ async function buscarDatos(input) {
                         input.value = item.NOMBRE;
                         latitudInput.value = item.LATITUD;
                         longitudInput.value = item.LONGITUD;
-                        resultsContainer.innerHTML = ''; 
+                        resultsContainer.innerHTML = '';
                     });
 
                     resultsContainer.appendChild(resultItem);
@@ -255,21 +332,3 @@ document.addEventListener('click', (event) => {
         }
     });
 });
-
-/*
-  const insertQuery = `INSERT INTO usuario (usuario, contraseña, rol) VALUES ('${user}', '${hashedPassword}', '${rol}')`;
-
-  try {
-    const result: any = await window.electronAPI.insertDatabase(insertQuery);
-    if (result.error) {
-      console.error('Error en la consulta:', result.error);
-      showToast(`Error en la consulta: ${result.error}`);
-    } else {
-      showToast('Usuario cargado con éxito');
-      console.log('Inserción exitosa:', result);
-    }
-  } catch (error) {
-    console.error('Error al realizar la consulta:', error);
-    showToast(`Error al realizar la consulta: ${error}`);
-  }
-*/

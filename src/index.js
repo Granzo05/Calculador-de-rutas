@@ -99,23 +99,6 @@ async function executeQuery(query) {
   }
 }
 
-const lobToString = (lob) => {
-  return new Promise((resolve, reject) => {
-    let lobData = '';
-
-    lob.setEncoding('utf8');
-    lob.on('data', (chunk) => {
-      lobData += chunk;
-    });
-    lob.on('end', () => {
-      resolve(lobData);
-    });
-    lob.on('error', (err) => {
-      reject(err);
-    });
-  });
-};
-
 async function executeInsert(query, params) {
   if (connection) {
     try {
