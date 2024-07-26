@@ -125,7 +125,7 @@ function addNewInput(idContainer) {
         newNombre.type = 'text';
         newNombre.className = 'nombre';
         newNombre.placeholder = 'Nombre o número...';
-        newNombre.oninput = function () { buscarDatos(this) };
+        newNombre.oninput = function () { buscarDatos(this, idContainer) };
 
         const divResultados = document.createElement('div');
         divResultados.className = 'results-container';
@@ -188,7 +188,7 @@ async function buscarDatos(input, idContainer) {
     const nombresSet = new Set([...nombresLlegada, ...nombresPartida]);
     const nombres = Array.from(nombresSet);
 
-    const query = `SELECT * FROM ubicaciones WHERE nombre LIKE '${input.value}%' AND ROWNUM <= 5`;
+    const query = `SELECT * FROM ubicaciones WHERE nombre LIKE '%${input.value}%' AND ROWNUM <= 5`;
 
     try {
         const ubicaciones = await window.electronAPI.selectDatabase(query);
@@ -242,7 +242,7 @@ async function buscarDatos(input, idContainer) {
     }
 }
 
-
+// Cierra el div de resultados
 document.addEventListener('click', (event) => {
     const resultsContainers = document.querySelectorAll('.results-container');
     resultsContainers.forEach((container) => {
