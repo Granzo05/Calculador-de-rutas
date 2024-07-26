@@ -2,7 +2,6 @@ const { app, BrowserWindow, screen: electronScreen, ipcMain } = require('electro
 const path = require('path');
 const oracledb = require('oracledb');
 require('dotenv').config();
-const argon2 = require('argon2');
 
 // Configuración del cliente Oracle
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
@@ -32,7 +31,7 @@ const createWindow = () => {
   if (process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     mainWindow.loadURL(process.env.MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
-    mainWindow.loadFile(path.join(__dirname, './html/index.html'));
+    mainWindow.loadFile(path.join(__dirname, './index.html'));
   }
 
   mainWindow.webContents.openDevTools();
