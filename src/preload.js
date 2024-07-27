@@ -7,9 +7,9 @@ contextBridge.exposeInMainWorld('excel', {
 });
 
 contextBridge.exposeInMainWorld('electronAPI', {
-    selectDatabase: async (query) => {
+    selectDatabase: async (query, params) => {
         try {
-            const response = await ipcRenderer.invoke('select-database', query);
+            const response = await ipcRenderer.invoke('select-database', query, params);
             return response;
         } catch (error) {
             console.error('Error:', error);

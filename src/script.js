@@ -18,7 +18,7 @@ async function calcularDistancia() {
             const lat2 = parseFloat(latitudesLlegada[j].value);
             const lon2 = parseFloat(longitudesLlegada[j].value);
 
-            const R = 6371; 
+            const R = 6371;
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
 
@@ -26,15 +26,36 @@ async function calcularDistancia() {
                 Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
                 Math.sin(dLon / 2) * Math.sin(dLon / 2);
             const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            const distancia = (R * c) * 1.15; 
+            const distancia = (R * c) * 1.15;
 
-            return Math.ceil(distancia * 100) / 100; 
+            return Math.ceil(distancia * 100) / 100;
         });
     });
 
+    const modal = document.getElementById('myModal');
+    modal.style.display = 'flex';
+
+    const title = document.getElementById('title-modal');
+    const mensaje = document.getElementById('mensaje-modal');
+
+    title.innerHTML = 'Creando excel';
+    mensaje.innerHTML = 'Se están calculando las rutas, puede demorar unos minutos dependiendo la cantidad de datos...';
+
     const filePathExcel = await window.excel.createExcel(nombresPartida, nombresLlegada, distancias);
 
-    await guardarNombres(filePathExcel);
+    title.innerHTML = 'Excel creado correctamente';
+    mensaje.innerHTML = 'Encontrarás el excel en ' + filePathExcel + '\nEstamos verificando si hay datos nuevos que almacenar...';
+
+    await guardarNombres();
+
+    mensaje.innerHTML = 'Encontrarás el excel en ' + filePathExcel + '\nYa podés cerrar el mensaje';
+    document.getElementById('spinner').style.display = 'none';
+
+    document.getElementById('button-modal').style.display = 'block';
+}
+
+function cerrarModal() {
+    document.getElementById('myModal').style.display = 'none';
 }
 
 
@@ -52,9 +73,22 @@ async function guardarNombres(filePathExcel) {
 
     let datosNuevos = [];
 
+    // Consulta para obtener nombres existentes
+    const queryExisting = `SELECT nombre FROM ubicaciones`;
+    let existingNames = [];
+
+    try {
+        const result = await window.electronAPI.selectDatabase(queryExisting, []);
+
+        existingNames = result.rows.map(item => item.NOMBRE.trim().toLowerCase());
+    } catch (error) {
+        console.error('Error al obtener nombres existentes:', error);
+        return; // Si no se pueden obtener los nombres existentes, detiene la función
+    }
+
     // Recopilar datos de partida
     for (let i = 0; i < nombresPartida.length; i++) {
-        const nombrePartida = nombresPartida[i].value.trim();
+        let nombrePartida = nombresPartida[i].value.trim();
         const latitudPartida = latitudesPartida[i].value.trim();
         const longitudPartida = longitudesPartida[i].value.trim();
 
@@ -62,17 +96,17 @@ async function guardarNombres(filePathExcel) {
             continue;
         }
 
-        // Verifica si el nombre es nuevo
-        const esNuevo = !filteredUbicaciones.some(item => item.NOMBRE.toLowerCase() === nombrePartida.toLowerCase());
+        nombrePartida = nombrePartida.replace(/["'¡?!¿,]/g, '');
 
-        if (esNuevo) {
+        // Verifica si el nombre es nuevo
+        if (!existingNames.includes(nombrePartida.toLowerCase())) {
             datosNuevos.push({ nombre: nombrePartida, latitud: latitudPartida, longitud: longitudPartida });
         }
     }
 
     // Recopilar datos de llegada
     for (let i = 0; i < nombresLlegada.length; i++) {
-        const nombreLlegada = nombresLlegada[i].value.trim();
+        let nombreLlegada = nombresLlegada[i].value.trim();
         const latitudLlegada = latitudesLlegada[i].value.trim();
         const longitudLlegada = longitudesLlegada[i].value.trim();
 
@@ -80,17 +114,16 @@ async function guardarNombres(filePathExcel) {
             continue;
         }
 
-        // Verifica si el nombre es nuevo
-        const esNuevo = !filteredUbicaciones.some(item => item.NOMBRE.toLowerCase() === nombreLlegada.toLowerCase());
+        nombreLlegada = nombreLlegada.replace(/["'¡?!¿,]/g, '');
 
-        if (esNuevo) {
+        // Verifica si el nombre es nuevo
+        if (!existingNames.includes(nombreLlegada.toLowerCase())) {
             datosNuevos.push({ nombre: nombreLlegada, latitud: latitudLlegada, longitud: longitudLlegada });
         }
     }
 
     if (datosNuevos.length > 0) {
         const insertQuery = `INSERT INTO ubicaciones (nombre, latitud, longitud) VALUES (:nombre, :latitud, :longitud)`;
-        console.log(datosNuevos);
         try {
             for (const dato of datosNuevos) {
                 const result = await window.electronAPI.insertDatabase(insertQuery, [dato.nombre, dato.latitud, dato.longitud]);
@@ -98,13 +131,22 @@ async function guardarNombres(filePathExcel) {
                     console.error('Error en la inserción:', result.error);
                 }
             }
-
-            alert('Los datos nuevos han sido guardados exitosamente en la carpeta: ' + filePathExcel);
         } catch (error) {
             console.error('Error al realizar la consulta:', error);
         }
-    } else {
-        console.log('No hay datos nuevos para insertar.');
+    }
+}
+
+
+function handleLatLongInput(input) {
+    const container = input.closest('.inputs-container');
+    const longitudInput = container.querySelector('.longitud-input');
+    const value = input.value;
+    const [lat, long] = value.split(',').map(coord => coord.trim());
+
+    if (lat && long) {
+        input.value = lat;
+        longitudInput.value = long;
     }
 }
 
@@ -113,11 +155,13 @@ function addNewInput(idContainer) {
 
     if (container) {
         // Obtener todos los campos en el contenedor
-        const allInputs = Array.from(container.querySelectorAll('.longitud-input'));
-        const lastInput = allInputs[allInputs.length - 1];
+        const allInputs = Array.from(container.querySelectorAll('.nombre, .latitud-input, .longitud-input'));
+        const nombreInput = allInputs[allInputs.length - 3];
+        const latitudInput = allInputs[allInputs.length - 2];
+        const longitudInput = allInputs[allInputs.length - 1];
 
-        // Verificar si el último campo está vacío y no se ha creado un nuevo campo después
-        if (lastInput && lastInput.value.trim() === '') {
+        // Verificar si estan los 3 campos vacios para no crear de más, es decir que si creo un nuevo span con inputs, hasta que alguno de estos no se llene no se crean más
+        if (nombreInput && nombreInput.value.trim() === '' && latitudInput && latitudInput.value.trim() === '' && longitudInput && longitudInput.value.trim() === '') {
             return;
         }
 
@@ -127,7 +171,7 @@ function addNewInput(idContainer) {
         newNombre.type = 'text';
         newNombre.className = 'nombre';
         newNombre.placeholder = 'Nombre o número...';
-        newNombre.oninput = function () { buscarDatos(this, idContainer) };
+        newNombre.oninput = function () { buscarDatos(this, idContainer); handleInput(this, idContainer); };
 
         const divResultados = document.createElement('div');
         divResultados.className = 'results-container';
@@ -136,11 +180,13 @@ function addNewInput(idContainer) {
         newInputLatitud.type = 'text';
         newInputLatitud.className = 'latitud-input';
         newInputLatitud.placeholder = 'Latitud...';
+        newInputLatitud.oninput = function () { handleLatLongInput(this); handleInput(this, idContainer); };
 
         const newInputLongitud = document.createElement('input');
         newInputLongitud.type = 'text';
         newInputLongitud.className = 'longitud-input';
         newInputLongitud.placeholder = 'Longitud...';
+        newInputLongitud.oninput = function () { handleInput(this, idContainer); };
 
         const borrar = document.createElement('span');
         borrar.innerHTML = `x`;
@@ -162,18 +208,12 @@ function addNewInput(idContainer) {
 
         container.appendChild(hr);
         container.appendChild(span);
-
-        newInputLongitud.addEventListener('input', () => {
-            handleInput(newInputLongitud, idContainer)
-        });
     }
 }
 
-function handleInput(event, idContainer) {
-    if (event.value.trim().length >= 1) {
-        addNewInput(
-            idContainer
-        );
+function handleInput(inputElement, idContainer) {
+    if (inputElement.value.trim().length >= 1) {
+        addNewInput(idContainer);
     }
 }
 
@@ -183,17 +223,19 @@ async function buscarDatos(input, idContainer) {
     const puntosPartida = document.getElementById('inputs-container-partida');
     const puntosLlegada = document.getElementById('inputs-container-llegada');
 
-    const nombresPartida = Array.from(puntosPartida?.getElementsByClassName('nombre') || []).map(input => input.value.trim().toLowerCase());
-    const nombresLlegada = Array.from(puntosLlegada?.getElementsByClassName('nombre') || []).map(input => input.value.trim().toLowerCase());
+    const nombresPartida = Array.from(puntosPartida?.getElementsByClassName('nombre') || [])
+        .map(input => input.value.trim().toLowerCase());
+    const nombresLlegada = Array.from(puntosLlegada?.getElementsByClassName('nombre') || [])
+        .map(input => input.value.trim().toLowerCase());
 
-    // Combina los nombres y elimina duplicados
     const nombresSet = new Set([...nombresLlegada, ...nombresPartida]);
     const nombres = Array.from(nombresSet);
 
-    const query = `SELECT * FROM ubicaciones WHERE nombre LIKE '%${input.value}%'`;
+    const inputValue = input.value.trim();
+    const query = `SELECT * FROM ubicaciones WHERE nombre LIKE :inputValue ORDER BY nombre FETCH FIRST 7 ROWS ONLY`;
 
     try {
-        const ubicaciones = await window.electronAPI.selectDatabase(query);
+        const ubicaciones = await window.electronAPI.selectDatabase(query, [inputValue + '%']);
 
         if (ubicaciones.error) {
             console.error('Error en la consulta:', ubicaciones.error);
@@ -202,7 +244,6 @@ async function buscarDatos(input, idContainer) {
                 const resultsContainer = input.nextElementSibling;
                 resultsContainer.innerHTML = '';
 
-                // Usa un Set para eliminar duplicados en ubicaciones.rows basado en NOMBRE
                 const ubicacionesSet = new Set();
 
                 filteredUbicaciones = ubicaciones.rows.filter(item => {

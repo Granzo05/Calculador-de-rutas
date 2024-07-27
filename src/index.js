@@ -71,10 +71,10 @@ async function connectToDatabase() {
   }
 }
 
-async function executeQuery(query) {
+async function executeQuery(query, params) {
   if (connection) {
     try {
-      const result = await connection.execute(query, [], { outFormat: oracledb.OUT_FORMAT_OBJECT });
+      const result = await connection.execute(query, params, { outFormat: oracledb.OUT_FORMAT_OBJECT });
 
       // Procesa los LOBs
       const processedRows = await Promise.all(result.rows.map(async (row) => {
@@ -110,9 +110,9 @@ async function executeInsert(query, params) {
   }
 }
 
-ipcMain.handle('select-database', async (event, query) => {
+ipcMain.handle('select-database', async (event, query, params) => {
   try {
-    return await executeQuery(query);
+    return await executeQuery(query, params);
   } catch (err) {
     return { error: err.message };
   }
