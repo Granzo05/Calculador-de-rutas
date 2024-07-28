@@ -39,23 +39,21 @@
     "oracledb": "^6.6.0"
   },
   "build": {
-    "appId": "com.tuaplicacion.id",
+    "appId": "calculadorKM",
     "productName": "Calculador de kilómetros",
     "files": [
       "dist/**/*",
       "src/**/*",
-      "package.json"
+      "package.json",
+      "Wallet/**/*",
+      ".env"
     ],
     "directories": {
-      "output": "build"
+      "buildResources": "build"
     },
     "win": {
       "target": "nsis",
-      "icon": "dist/assets/logo.png",
-      "sign": false
-    },
-    "nsis": {
-      "include": "build/installer.nsh"
+      "icon": "dist/assets/logo.ico"
     }
   }
 }

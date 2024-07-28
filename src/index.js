@@ -3,6 +3,7 @@ const path = require('path');
 const oracledb = require('oracledb');
 require('dotenv').config();
 const ExcelJS = require('exceljs');
+const fs = require('fs');
 
 // Configuración del cliente Oracle
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
@@ -35,6 +36,7 @@ const createWindow = () => {
 };
 
 app.on('ready', async () => {
+  await modifySqlNetOra();
   await connectToDatabase();
   createWindow();
 });
@@ -58,12 +60,26 @@ app.on('activate', () => {
   }
 });
 
+function modifySqlNetOra() {
+  const walletPath = path.join(app.getAppPath(), 'Wallet');
+  const sqlNetOraPath = path.join(walletPath, 'sqlnet.ora');
+
+  try {
+    let sqlNetOraContent = fs.readFileSync(sqlNetOraPath, 'utf8');
+    sqlNetOraContent = sqlNetOraContent.replace(/DIRECTORY\s*=\s*.+\)/, `DIRECTORY = ${walletPath})))`);
+    fs.writeFileSync(sqlNetOraPath, sqlNetOraContent, 'utf8');
+    console.log('sqlnet.ora modificado correctamente');
+  } catch (err) {
+    console.error('Error al modificar sqlnet.ora:', err);
+  }
+}
+
 async function connectToDatabase() {
   try {
     connection = await oracledb.getConnection({
       user: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
-      connectString: path.join(__dirname, '../Wallet'),
+      connectString: process.env.DB_CONNECT_STRING,
     });
     console.log('Conexión exitosa a la base de datos');
   } catch (err) {
@@ -143,11 +159,11 @@ ipcMain.handle('generate-excel', async (event, nombresPartida, nombresLlegada, d
   worksheet.addRow(['Nombres', ...nombresLlegada]);
 
   nombresPartida.forEach((nombrePartida, i) => {
-      const row = [nombrePartida];
-      nombresLlegada.forEach((_, j) => {
-          row.push(parseInt(distancias[i][j]));
-      });
-      worksheet.addRow(row);
+    const row = [nombrePartida];
+    nombresLlegada.forEach((_, j) => {
+      row.push(parseInt(distancias[i][j]));
+    });
+    worksheet.addRow(row);
   });
 
   let filePath = '';
@@ -155,16 +171,16 @@ ipcMain.handle('generate-excel', async (event, nombresPartida, nombresLlegada, d
 
   // Intentar guardar el archivo con un nombre único
   while (true) {
-      const archivo = index === 0 ? '' : `(${index})`;
-      filePath = path.join(app.getPath('downloads'), `distancias${archivo}.xlsx`);
-      
-      try {
-          await workbook.xlsx.writeFile(filePath);
-          break; 
-      } catch (error) {
-          console.error('Error al guardar el archivo:', error);
-          index++;
-      }
+    const archivo = index === 0 ? '' : `(${index})`;
+    filePath = path.join(app.getPath('downloads'), `distancias${archivo}.xlsx`);
+
+    try {
+      await workbook.xlsx.writeFile(filePath);
+      break;
+    } catch (error) {
+      console.error('Error al guardar el archivo:', error);
+      index++;
+    }
   }
 
   return filePath;
