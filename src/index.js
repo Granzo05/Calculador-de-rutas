@@ -62,6 +62,29 @@ app.on('activate', () => {
 
 function modifySqlNetOra() {
   const walletPath = path.join(app.getAppPath(), 'Wallet');
+
+  const env = path.join(app.getAppPath(), '.env');
+
+  try {
+    let envContent = fs.readFileSync(env, 'utf8');
+    envContent = envContent.replace(/TNS_ADMIN\s*=\s*.*/, `TNS_ADMIN=${walletPath}`);
+    fs.writeFileSync(env, envContent, 'utf8');
+    console.log('Archivo env modificado correctamente');
+  } catch (err) {
+    console.error('Error al modificar el archivo de propiedades:', err);
+  }
+
+  const propertiesFilePath = path.join(walletPath, 'ojdbc.properties');
+
+  try {
+    let propertiesContent = fs.readFileSync(propertiesFilePath, 'utf8');
+    propertiesContent = propertiesContent.replace(/DIRECTORY\s*=\s*.+\)/, `DIRECTORY=${walletPath})))`);
+    fs.writeFileSync(propertiesFilePath, propertiesContent, 'utf8');
+    console.log('Archivo de propiedades modificado correctamente');
+  } catch (err) {
+    console.error('Error al modificar el archivo de propiedades:', err);
+  }
+
   const sqlNetOraPath = path.join(walletPath, 'sqlnet.ora');
 
   try {

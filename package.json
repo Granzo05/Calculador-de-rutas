@@ -42,8 +42,7 @@
     "appId": "calculadorKM",
     "productName": "Calculador de kilómetros",
     "files": [
-      "dist/**/*",
-      "src/**/*",
+      "src/**",
       "package.json",
       "Wallet/**/*",
       ".env"
