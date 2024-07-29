@@ -8,6 +8,8 @@ lerna-debug.log*
 
 Wallet 
 
+instantclient_21_13
+
 .env
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
@@ -98,3 +100,5 @@ out/
 build
 
 dist
+
+out

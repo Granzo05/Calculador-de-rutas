@@ -7,7 +7,7 @@ const fs = require('fs');
 
 // Configuración del cliente Oracle
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
-oracledb.initOracleClient({ libDir: 'B:/Oracle/instantclient_21_13' });
+oracledb.initOracleClient({ libDir: path.resolve(__dirname, '..', '..', 'instantclient_21_13') });
 
 if (require('electron-squirrel-startup')) {
   app.quit();
@@ -26,11 +26,11 @@ const createWindow = () => {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       enableRemoteModule: false,
-      nodeIntegration: false
+      nodeIntegration: false, 
     },
   });
 
-  mainWindow.loadFile(path.join(__dirname, './index.html'));
+  mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
   mainWindow.webContents.openDevTools();
 };
@@ -61,18 +61,7 @@ app.on('activate', () => {
 });
 
 function modifySqlNetOra() {
-  const walletPath = path.join(app.getAppPath(), 'Wallet');
-
-  const env = path.join(app.getAppPath(), '.env');
-
-  try {
-    let envContent = fs.readFileSync(env, 'utf8');
-    envContent = envContent.replace(/TNS_ADMIN\s*=\s*.*/, `TNS_ADMIN=${walletPath}`);
-    fs.writeFileSync(env, envContent, 'utf8');
-    console.log('Archivo env modificado correctamente');
-  } catch (err) {
-    console.error('Error al modificar el archivo de propiedades:', err);
-  }
+  const walletPath = path.resolve(__dirname, '..', '..', 'instantclient_21_13', 'network', 'admin');
 
   const propertiesFilePath = path.join(walletPath, 'ojdbc.properties');
 
@@ -100,11 +89,11 @@ function modifySqlNetOra() {
 async function connectToDatabase() {
   try {
     connection = await oracledb.getConnection({
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      connectString: process.env.DB_CONNECT_STRING,
+      user: 'USER',
+      password: 'buensabor1234567qQ@.',
+      connectString: 'buensabor_medium',
     });
-    console.log('Conexión exitosa a la base de datos');
+    console.log('Conexion exitosa a la base de datos');
   } catch (err) {
     console.error('Error al conectar a la base de datos:', err);
   }

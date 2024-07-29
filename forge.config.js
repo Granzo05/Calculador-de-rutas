@@ -4,12 +4,22 @@ const { FuseV1Options, FuseVersion } = require('@electron/fuses');
 module.exports = {
   packagerConfig: {
     asar: true,
+    extraResource: [
+      "./instantclient_21_13"
+    ],
+    out: 'Calculador',
   },
   rebuildConfig: {},
   makers: [
     {
       name: '@electron-forge/maker-squirrel',
-      config: {},
+      config: {
+        name: 'calculador',
+        authors: 'Facundo Granzotto',
+        description: 'My Electron application description',
+        version: '1.0.0',
+        license: 'MIT'
+      },
     },
     {
       name: '@electron-forge/maker-zip',
@@ -29,8 +39,6 @@ module.exports = {
       name: '@electron-forge/plugin-auto-unpack-natives',
       config: {},
     },
-    // Fuses are used to enable/disable various Electron functionality
-    // at package time, before code signing the application
     new FusesPlugin({
       version: FuseVersion.V1,
       [FuseV1Options.RunAsNode]: false,

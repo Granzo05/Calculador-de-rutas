@@ -59,7 +59,7 @@ function cerrarModal() {
 }
 
 
-async function guardarNombres(filePathExcel) {
+async function guardarNombres() {
     const puntosPartida = document.getElementById('inputs-container-partida');
     const puntosLlegada = document.getElementById('inputs-container-llegada');
 
