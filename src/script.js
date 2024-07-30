@@ -46,7 +46,7 @@ async function calcularDistancia() {
     title.innerHTML = 'Excel creado correctamente';
     mensaje.innerHTML = 'Encontrarás el excel en ' + filePathExcel + '\nEstamos verificando si hay datos nuevos que almacenar...';
 
-    await guardarNombres();
+    //await guardarNombres();
 
     mensaje.innerHTML = 'Encontrarás el excel en ' + filePathExcel + '\nYa podés cerrar el mensaje';
     document.getElementById('spinner').style.display = 'none';
@@ -232,7 +232,7 @@ async function buscarDatos(input, idContainer) {
     const nombres = Array.from(nombresSet);
 
     const inputValue = input.value.trim();
-    const query = `SELECT * FROM ubicaciones WHERE nombre LIKE :inputValue ORDER BY nombre FETCH FIRST 7 ROWS ONLY`;
+    const query = `SELECT * FROM ubicaciones WHERE nombre LIKE :inputValue ORDER BY nombre FETCH FIRST 25 ROWS ONLY`;
 
     try {
         const ubicaciones = await window.electronAPI.selectDatabase(query, [inputValue + '%']);
@@ -293,5 +293,69 @@ document.addEventListener('click', (event) => {
         if (!container.contains(event.target) && !container.previousElementSibling?.contains(event.target)) {
             container.style.display = 'none';
         }
+    });
+});
+
+document.getElementById('div-ayuda').addEventListener('click', (event) => {
+    document.getElementById('div-ayuda').style.display = 'none';
+    document.getElementById('container-app').style.display = 'none';
+    document.getElementById('button').style.display = 'none';
+
+    document.getElementById('div-cerrar').style.display = 'flex';
+    document.getElementById('container-help').style.display = 'flex';
+});
+
+document.getElementById('div-cerrar').addEventListener('click', (event) => {
+    document.getElementById('div-ayuda').style.display = 'flex';
+    document.getElementById('container-app').style.display = 'block';
+    document.getElementById('button').style.display = 'block';
+
+    document.getElementById('div-cerrar').style.display = 'none';
+    document.getElementById('container-help').style.display = 'none';
+});
+
+
+document.getElementById('button-partida').addEventListener('click', (event) => {
+    const container = document.getElementById('inputs-container-partida');
+
+    const allInputs = Array.from(container.querySelectorAll('.nombre, .latitud-input, .longitud-input'));
+    const nombreInput = allInputs[allInputs.length - 3];
+    const latitudInput = allInputs[allInputs.length - 2];
+    const longitudInput = allInputs[allInputs.length - 1];
+
+    // Verificar si estan los 3 campos vacios para no crear de más, es decir que si creo un nuevo span con inputs, hasta que alguno de estos no se llene no se crean más
+    if (nombreInput && nombreInput.value.trim() === '' && latitudInput && latitudInput.value.trim() === '' && longitudInput && longitudInput.value.trim() === '') {
+        alert('No es necesario crear un nuevo campo ya que existe uno vacío');
+        return;
+    } else {
+        addNewInput('inputs-container-partida');
+    }
+});
+
+document.getElementById('button-llegada').addEventListener('click', (event) => {
+    const container = document.getElementById('inputs-container-llegada');
+
+    const allInputs = Array.from(container.querySelectorAll('.nombre, .latitud-input, .longitud-input'));
+    const nombreInput = allInputs[allInputs.length - 3];
+    const latitudInput = allInputs[allInputs.length - 2];
+    const longitudInput = allInputs[allInputs.length - 1];
+
+    // Verificar si estan los 3 campos vacios para no crear de más, es decir que si creo un nuevo span con inputs, hasta que alguno de estos no se llene no se crean más
+    if (nombreInput && nombreInput.value.trim() === '' && latitudInput && latitudInput.value.trim() === '' && longitudInput && longitudInput.value.trim() === '') {
+        alert('No es necesario crear un nuevo campo ya que existe uno vacío');
+        return;
+    } else {
+        addNewInput('inputs-container-llegada');
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const faqItems = document.querySelectorAll('.faq-item');
+
+    faqItems.forEach(item => {
+        const title = item.querySelector('.faq-title');
+        title.addEventListener('click', () => {
+            item.classList.toggle('active');
+        });
     });
 });

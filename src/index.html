@@ -9,8 +9,129 @@
 </head>
 
 <body>
-    <div class="container">
-        <p>Puntos de partida</p>
+    <div class="ayuda" id="div-ayuda">
+        <p>Ayuda</p>
+        <img
+            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAAC7klEQVR4nO2av2sUQRTHPyC4CWJIQBNB0PwDdlpFBEESBCWxkZg0grUYgpLGWr2LiJJAsLFIYSNYRE8NNmoVxMLKu/wAxdNCIjYiJJ5mZeAtDMfc3t7OzN4a8oUvHOzce/vdffPmzZuFHWxf9AAjwDRQAirAD2BTqH6X5ZoaMwx0kxMEwDiwCPwBwhap/vMcGBNbmaMTmAS+prj5RvwCTAAdWYk4Daw5FFDPVWDIpwD16u95FFDPeXnzTtEHvMtQRCh8C/S6EtEvrztsE1fkHqywX9Jo2GauAQfSiuhoUziFMWGWKkXP5eDmwzrOpEmxtk5/yWKnMt0t4IGs7LZ2B5OK6LRcJ9RqfSOm/DgOvLec/EESIZMWTmrAuYQP65WFnyvNHASWZYcKIR0nJa7n5QHt0a6pLPQzpZ9qs7cybjknVAUc4aphjErlex0llAtxQhYtDKvyPMIhCTPTuClt3HkLf88aiehJWYpHfCMZ5SBwLWbcQ83nCQt/NaDLJGTEwmjatWDY0tZZk5DbGYj4CxzTfBYt7RVNQkoZCJnV/KkM9s3S3oJJyIpnEZ/qYrrgwGbFJOS7RxFqYg5ovgYsE0soXDcJ2fQo5LrmR5UuHx3Z3chSyGtgl+bnkUPbG1mFlgqfI5qPS47tr5uELHsQUqpbcF0/rLJJyFMPQu5o9oc82F8wCZn24OimZv+iB/sFkxDbcsHEx8Ap4YwH+2dMQrod5fas+LtR0ajwIgc3GCakmtMNMebY2RPZf0xJ88Gl7dE4IYF0xV05UzvOCEcd2q0Cu2mCif9AyGUSdhhXcyyk0krH0dXipbYGL4U2vaxQuCWpvCXMOgwFV7xLCgTSOA5zwqUkE7wR9uXoWKEPS/RnsA2O4zJwGEfobVOYLclhk5fD0K2MRNz3ffY+6DnUKmlSbFoE0tqvOhTwWVbstnwBEUhXvBTTtI5jTarYUZvU6hpd0ostStVblj169FGN+v1BtqcF2RTpRww72Fb4B9AyEV20mbQXAAAAAElFTkSuQmCC">
+    </div>
+
+    <div class="ayuda" id="div-cerrar" style="display: none;">
+        <p>Cerrar</p>
+        <img
+            src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAAB/ElEQVR4nO2au0oDQRSGP7RYAxYiirWgD6CgW1gqqKAvoT6E8QVyKYyl2mujhb6AsdBeREyRShAEi4hiY4wXFiJITLJnZ2dmxyU/TLfznznLtztnzyz01JNVlYGvLuMJ8A3E9Zve3WIHaxPrKsQsGFVgUGMSgVdVEDdYm1jTQF1guqcxkX1BvAYwG9U4LzAOxqqGJJaAT0GsnIq5B9wIzB+BsRhJjAIPgjgVYCDOw9cQBDmNkcixwP8DmCOmpIitK3hvCL1zaJAUsVdgMoLvOPBiGilVxC6BfsLVB5zbQkoVsSzh2rKJlCpi78AMnTUFvNlGShWxWyDT4WZcJ4VUqwpCLEp/ZsKOcG4eC5IiFuzUy7/mLQh374pJpFQRuweGgSHgzhWkVBE7bA7JtQUSkBQx6bCKlCpiTiKliljibynTiCWKlC7EnEBKB2JOINWqokIiibxuU4+Wp+Fhb1dg/guknEPMT8OG6BkoUTIuI3XgctHop6GM9yJ8WAWt0B/NNxfqDGJFISbbbeaWXEHMT0PzwRMiVdfYDsokWRRuCryySRWVvhCpC5dbpl6EJvZExCb2s03ECkIM1hS8120h5guROokR48g0Yp6lo7eRCEdvGZNIrRBfi8J2at4UUrvoU3DUrR2x1PwwUA4xqxn8haMWEvvMQNyeeqKDvgGmxjw+5jmxEQAAAABJRU5ErkJggg==">
+    </div>
+
+    <div class="container" id="container-help" style="display: none;">
+        <span class="faq-item">
+            <h3 class="faq-title">¿Cómo funciona la aplicación? <span class="chevron">▼</span></h3>
+            <div class="faq-content">
+                <p>La aplicación utiliza coordenadas geográficas para calcular distancias entre puntos. Para cada lugar,
+                    debes asignar un nombre y proporcionar sus coordenadas (latitud y longitud). Estos datos se
+                    almacenarán para uso futuro.</p>
+            </div>
+        </span>
+
+        <span class="faq-item">
+            <h3 class="faq-title">¿Cómo buscar datos geográficos de un lugar con Google Maps? <span
+                    class="chevron">▼</span></h3>
+            <div class="faq-content">
+                <p>Para encontrar coordenadas, utiliza Google Maps. Busca la dirección o nombre del lugar, por ejemplo,
+                    "Escuela 1-356 Victoriano Montes". Luego, sigue estos pasos:</p>
+                <p>1. Presiona el botón indicado para abrir el mapa completo.</p>
+                <img src="./images/ejemplo1.png" alt="Ejemplo 1">
+                <p>2. Haz clic derecho en el punto rojo y selecciona la opción con las coordenadas (latitud y longitud)
+                    para copiarlas.</p>
+                <img src="./images/ejemplo2.png" alt="Ejemplo 2">
+                <img src="./images/ejemplo3.png" alt="Ejemplo 3">
+                <p>3. En la aplicación, pega las coordenadas en el campo de Latitud usando Ctrl + V o la opción de pegar
+                    del menú contextual.</p>
+                <p>Repite estos pasos para cada lugar que necesites agregar.</p>
+                <img src="./images/ejemplo4.png" alt="Ejemplo 4">
+            </div>
+        </span>
+
+        <span class="faq-item">
+            <h3 class="faq-title">¿Cómo buscar datos geográficos de un lugar sin Google Maps? <span
+                    class="chevron">▼</span></h3>
+            <div class="faq-content">
+                <p>Para encontrar coordenadas, sin utilizar Google Maps. Busca la dirección o nombre del lugar, por
+                    ejemplo,
+                    "Escuela 1-356 Victoriano Montes". Luego, sigue estos pasos:</p>
+                <p>1. Buscar y abrir la página GEOdestinos Mendoza (Suele aparecer primera en las busquedas)</p>
+                <img src="./images/ejemplo10.png" alt="Ejemplo 1">
+                <p>2. A diferencia de Google Maps, encontrarás las coordenadas debajo del mapa, deberás copiar cada una
+                    por separado y pegarla donde corresponda</p>
+                <img src="./images/ejemplo11.png" alt="Ejemplo 2">
+                <p>3. En la aplicación, pega las coordenadas en el campo de Latitud usando Ctrl + V o la opción de pegar
+                    del menú contextual. Tenés que respetar el lugar, la latitud siempre en el campo del medio, es el
+                    valor cercano a -30, la longitud siempre en el casillero de la derecha siendo el valor más próximo a
+                    -60</p>
+                <p>Repite estos pasos para cada lugar que necesites agregar.</p>
+                <img src="./images/ejemplo12.png" alt="Ejemplo 3">
+            </div>
+        </span>
+
+        <span class="faq-item">
+            <h3 class="faq-title">¿Cómo saber qué datos colocar en partida y cuáles en llegada? <span
+                    class="chevron">▼</span></h3>
+            <div class="faq-content">
+                <p>Los datos de partida se usan como referencia principal y aparecerán en cada fila del archivo Excel.
+                    Serán comparados con cada punto de llegada. Puedes organizarlos según tu preferencia, ya que los
+                    datos se generarán de la misma manera en el archivo Excel.</p>
+            </div>
+        </span>
+
+        <span class="faq-item">
+            <h3 class="faq-title">Ya ingresé los datos, ¿cómo creo el archivo Excel? <span class="chevron">▼</span></h3>
+            <div class="faq-content">
+                <p>Una vez que hayas ingresado los datos:</p>
+                <p>1. Asegúrate de que estén todos los datos cargados, como se muestra en la imagen.</p>
+                <img src="./images/ejemplo6.png" alt="Datos cargados">
+                <p>2. Presiona el botón "Calcular distancia" al final de la página.</p>
+                <img src="./images/ejemplo7.png" alt="Botón calcular distancia">
+                <p>3. Espera a que se genere el archivo Excel y se guarden los datos.</p>
+                <img src="./images/ejemplo8.png" alt="Generación de archivo">
+                <p>4. El archivo se guardará en la ubicación especificada con el nombre "distancias".</p>
+                <img src="./images/ejemplo9.png" alt="Ruta del archivo">
+            </div>
+        </span>
+
+        <span class="faq-item">
+            <h3 class="faq-title">¿Qué significan los números del excel? <span class="chevron">▼</span></h3>
+            <div class="faq-content">
+                <p>Al crear el excel, el programa lo que realiza es una línea recta entre 2 puntos, por lo tanto los
+                    números que da el excel son KILOMETROS aproximados. Esto sirve para filtrar las opciones entre
+                    todas, supongamos que necesitas comparar 100 escuelas pero obtener la más cercana, con esto vas a
+                    reducir la búsqueda a 5-10 opciones lo que te ahorarrá mucho tiempo</p>
+            </div>
+        </span>
+
+
+        <span class="faq-item">
+            <h3 class="faq-title">Consejos para excel <span class="chevron">▼</span></h3>
+            <div class="faq-content">
+                <p>1) Marcar todos los números exceptuando los nombres</p>
+                <img src="./images/ejemplo13.png" alt="Datos cargados">
+                <p>2) Buscar en el menú de inicio de excel la opción de "Formato Condicional"</p>
+                <img src="./images/ejemplo14.png" alt="Datos cargados">
+                <p>3) Hacer click y buscar la opción "Nueva regla..."</p>
+                <img src="./images/ejemplo15.png" alt="Datos cargados">
+                <p>4) En la ventana desplegada buscar la opción "Estilo de formato" y seleccionar "Escala de 3 colores"
+                </p>
+                <p>Elegir la combinación de colores que más cómoda se te hagan, las que yo elegí marca las mínimas en
+                    verdes, las medianas en amarillo y las máximas en naranja, una vez elegidos los colores presionar el
+                    botón de "Aceptar"</p>
+                <img src="./images/ejemplo16.png" alt="Datos cargados">
+                <p>6) Ahora los datos se ven en colores, lo que facilita encontrar los menores y de ahi filtrar
+                    distancias manualmente</p>
+                <img src="./images/ejemplo17.png" alt="Datos cargados">
+            </div>
+        </span>
+    </div>
+
+
+    <div class="container" id="container-app">
+        <p style="font-size: 32px; text-decoration: underline;">Puntos de partida</p>
         <div id="inputs-container-partida">
             <span class="inputs-container">
                 <input type="text" class="nombre"
@@ -24,7 +145,11 @@
                     placeholder="Longitud..." />
             </span>
         </div>
-        <p>Puntos de llegada</p>
+        <button class="gray-button" id="button-partida">Crear punto de partida nuevo</button>
+        <div style="width: 100%;">
+            <hr>
+        </div>
+        <p style="font-size: 32px; text-decoration: underline;">Puntos de llegada</p>
         <div id="inputs-container-llegada">
             <span class="inputs-container">
                 <input type="text" class="nombre"
@@ -38,6 +163,7 @@
                     placeholder="Longitud..." />
             </span>
         </div>
+        <button class="gray-button" id="button-llegada">Crear punto de llegada nuevo</button>
     </div>
 
     <div id="myModal" class="modal">
@@ -45,11 +171,12 @@
             <h2 id="title-modal">Creando excel</h2>
             <p id="mensaje-modal">Aguarde un momento mientras se crea el archivo</p>
             <div class="loading-spinner" id="spinner"></div>
-            <button class="black-button" style="display: none;" id="button-modal" onclick="cerrarModal()">Cerrar</button>
+            <button class="black-button" style="display: none;" id="button-modal"
+                onclick="cerrarModal()">Cerrar</button>
         </div>
     </div>
-    
-    <button class="black-button" onclick="calcularDistancia()">Calcular distancia</button>
+
+    <button class="black-button" id="button" onclick="calcularDistancia()">Calcular distancia</button>
 
     <script src="./script.js"></script>
 </body>

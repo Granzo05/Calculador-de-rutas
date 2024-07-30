@@ -6,8 +6,8 @@ const ExcelJS = require('exceljs');
 const fs = require('fs');
 
 // Configuración del cliente Oracle
-oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
-oracledb.initOracleClient({ libDir: path.resolve(__dirname, '..', '..', 'instantclient_21_13') });
+//oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
+//oracledb.initOracleClient({ libDir: path.resolve(__dirname, '..', '..', 'instantclient_21_13') });
 
 if (require('electron-squirrel-startup')) {
   app.quit();
@@ -178,21 +178,23 @@ ipcMain.handle('generate-excel', async (event, nombresPartida, nombresLlegada, d
     worksheet.addRow(row);
   });
 
-  let filePath = '';
   let index = 0;
+  let filePath = '';
 
-  // Intentar guardar el archivo con un nombre único
   while (true) {
     const archivo = index === 0 ? '' : `(${index})`;
     filePath = path.join(app.getPath('downloads'), `distancias${archivo}.xlsx`);
 
-    try {
-      await workbook.xlsx.writeFile(filePath);
-      break;
-    } catch (error) {
-      console.error('Error al guardar el archivo:', error);
-      index++;
+    if (!fs.existsSync(filePath)) {
+      try {
+        await workbook.xlsx.writeFile(filePath);
+        break;
+      } catch (error) {
+        console.error('Error al guardar el archivo:', error);
+        throw error; 
+      }
     }
+    index++;
   }
 
   return filePath;
