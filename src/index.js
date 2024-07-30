@@ -6,8 +6,8 @@ const ExcelJS = require('exceljs');
 const fs = require('fs');
 
 // Configuración del cliente Oracle
-//oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
-//oracledb.initOracleClient({ libDir: path.resolve(__dirname, '..', '..', 'instantclient_21_13') });
+oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
+oracledb.initOracleClient({ libDir: path.resolve(__dirname, '..', '..', 'instantclient_21_13') });
 
 if (require('electron-squirrel-startup')) {
   app.quit();
