@@ -307,7 +307,7 @@ document.getElementById('div-ayuda').addEventListener('click', (event) => {
 
 document.getElementById('div-cerrar').addEventListener('click', (event) => {
     document.getElementById('div-ayuda').style.display = 'flex';
-    document.getElementById('container-app').style.display = 'block';
+    document.getElementById('container-app').style.display = 'flex';
     document.getElementById('button').style.display = 'block';
 
     document.getElementById('div-cerrar').style.display = 'none';
