@@ -32,7 +32,7 @@ const createWindow = () => {
 
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
-  mainWindow.webContents.openDevTools();
+  //mainWindow.webContents.openDevTools();
 };
 
 app.on('ready', async () => {
@@ -69,7 +69,6 @@ function modifySqlNetOra() {
     let propertiesContent = fs.readFileSync(propertiesFilePath, 'utf8');
     propertiesContent = propertiesContent.replace(/DIRECTORY\s*=\s*.+\)/, `DIRECTORY=${walletPath})))`);
     fs.writeFileSync(propertiesFilePath, propertiesContent, 'utf8');
-    console.log('Archivo de propiedades modificado correctamente');
   } catch (err) {
     console.error('Error al modificar el archivo de propiedades:', err);
   }
@@ -80,7 +79,6 @@ function modifySqlNetOra() {
     let sqlNetOraContent = fs.readFileSync(sqlNetOraPath, 'utf8');
     sqlNetOraContent = sqlNetOraContent.replace(/DIRECTORY\s*=\s*.+\)/, `DIRECTORY = ${walletPath})))`);
     fs.writeFileSync(sqlNetOraPath, sqlNetOraContent, 'utf8');
-    console.log('sqlnet.ora modificado correctamente');
   } catch (err) {
     console.error('Error al modificar sqlnet.ora:', err);
   }
@@ -93,7 +91,6 @@ async function connectToDatabase() {
       password: 'buensabor1234567qQ@.',
       connectString: 'buensabor_medium',
     });
-    console.log('Conexion exitosa a la base de datos');
   } catch (err) {
     console.error('Error al conectar a la base de datos:', err);
   }

@@ -46,9 +46,9 @@ async function calcularDistancia() {
     title.innerHTML = 'Excel creado correctamente';
     mensaje.innerHTML = 'Encontrarás el excel en ' + filePathExcel + '\nEstamos verificando si hay datos nuevos que almacenar...';
 
-    //await guardarNombres();
+    await guardarNombres();
 
-    mensaje.innerHTML = 'Encontrarás el excel en ' + filePathExcel + '\nYa podés cerrar el mensaje';
+    mensaje.innerHTML = 'Encontrarás el excel en ' + filePathExcel + '<br>Ya podés cerrar el mensaje';
     document.getElementById('spinner').style.display = 'none';
 
     document.getElementById('button-modal').style.display = 'block';
