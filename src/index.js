@@ -87,9 +87,9 @@ function modifySqlNetOra() {
 async function connectToDatabase() {
   try {
     connection = await oracledb.getConnection({
-      user: 'USER',
-      password: 'buensabor1234567qQ@.',
-      connectString: 'buensabor_medium',
+      user: 'USUARIO',
+      password: 'PASSWORD',
+      connectString: 'STRING PARA CONEXION CON ORACLE (VIENE CON LA WALLET DE DESCARGA, USANDO TNS PUEDE SER CUALQUIERA HIGH,MEDIUM,LOW)',
     });
   } catch (err) {
     console.error('Error al conectar a la base de datos:', err);
