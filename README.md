@@ -1,4 +1,4 @@
-Código disponible para análisis
+Aplicación de escritorio creada con Electron, código disponible para análisis.
 
 La aplicación consiste en un calculador de distancias entre puntos geográficos (Latitud y longitud), ayuda mucho cuando se necesita comparar muchas direcciones distintas para obtener las más cercanas a un punto ya que permite filtrar muchas opciones.
 Posee 2 secciones, puntos de partida y de llegada, donde cada punto de partida será comparado con cada punto de llegada. Los datos al final generarán un Excel con la distancia en kilómetros entre todos los puntos.
