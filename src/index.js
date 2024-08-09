@@ -7,6 +7,7 @@ require('dotenv').config();
 
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
 oracledb.initOracleClient({ libDir: path.resolve(__dirname, '..', 'instantclient_21_13') });
+//oracledb.initOracleClient({ libDir: path.resolve(__dirname, '..', '..', 'instantclient_21_13') });
 
 if (require('electron-squirrel-startup')) {
   app.quit();
@@ -62,6 +63,7 @@ app.on('activate', () => {
 // Función que adapta la ruta base del archivo dentro de las configuraciones de Oracle
 function modifySqlNetOra() {
   const walletPath = path.resolve(__dirname, '..', 'instantclient_21_13', 'network', 'admin');
+  //const walletPath = path.resolve(__dirname, '..', '..', 'instantclient_21_13', 'network', 'admin');
 
   const pathPropiedades = path.join(walletPath, 'ojdbc.properties');
 
@@ -172,7 +174,7 @@ ipcMain.handle('generate-excel', async (event, nombresPartida, nombresLlegada, d
       row.push(parseInt(distancias[i][j]));
     });
     worksheet.addRow(row);
-  }); 
+  });
 
   return guardarArchivoYObtenerPath(workbook);
 });
