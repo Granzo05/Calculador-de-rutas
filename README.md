@@ -16,9 +16,8 @@ Instrucciones para instalar:
   - Ya podés usar la aplicación, en la esquina superior derecha hay una sección de ayuda para que puedas guiarte.
 
 Instrucciones para desinstalar:
-  - Presionar Windows+R.
-  - En la ventana de diálogo escribir appdata.
-  - Abrir Roaming.
-  - Eliminar la carpeta "Calculador de kilómetros".
+  - Ingresar al panel de control.
+  - Seleccionar la opción de "Aplicaciones y características".
+  - Buscar la aplicación "Calculador de kilómetros" y desinstalar.
 
 Cualquier consejo o consulta es bienvenida, podés contactarme al correo: facu.granzotto5@gmail.com
