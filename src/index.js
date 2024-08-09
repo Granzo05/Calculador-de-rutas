@@ -1,13 +1,12 @@
 const { app, BrowserWindow, screen: electronScreen, ipcMain } = require('electron');
 const path = require('path');
 const oracledb = require('oracledb');
-require('dotenv').config();
 const ExcelJS = require('exceljs');
 const fs = require('fs');
+require('dotenv').config();
 
-// Configuración del cliente Oracle
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
-oracledb.initOracleClient({ libDir: path.resolve(__dirname, '..', '..', 'instantclient_21_13') });
+oracledb.initOracleClient({ libDir: path.resolve(__dirname, '..', 'instantclient_21_13') });
 
 if (require('electron-squirrel-startup')) {
   app.quit();
@@ -26,18 +25,18 @@ const createWindow = () => {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       enableRemoteModule: false,
-      nodeIntegration: false, 
+      nodeIntegration: false,
     },
   });
 
   mainWindow.loadFile(path.join(__dirname, 'index.html'));
 
-  //mainWindow.webContents.openDevTools();
+  mainWindow.webContents.openDevTools();
 };
 
 app.on('ready', async () => {
   await modifySqlNetOra();
-  await connectToDatabase();
+  await conectarDB();
   createWindow();
 });
 
@@ -60,48 +59,48 @@ app.on('activate', () => {
   }
 });
 
+// Función que adapta la ruta base del archivo dentro de las configuraciones de Oracle
 function modifySqlNetOra() {
-  const walletPath = path.resolve(__dirname, '..', '..', 'instantclient_21_13', 'network', 'admin');
+  const walletPath = path.resolve(__dirname, '..', 'instantclient_21_13', 'network', 'admin');
 
-  const propertiesFilePath = path.join(walletPath, 'ojdbc.properties');
+  const pathPropiedades = path.join(walletPath, 'ojdbc.properties');
 
   try {
-    let propertiesContent = fs.readFileSync(propertiesFilePath, 'utf8');
-    propertiesContent = propertiesContent.replace(/DIRECTORY\s*=\s*.+\)/, `DIRECTORY=${walletPath})))`);
-    fs.writeFileSync(propertiesFilePath, propertiesContent, 'utf8');
+    let contenido = fs.readFileSync(pathPropiedades, 'utf8');
+    contenido = contenido.replace(/DIRECTORY\s*=\s*.+\)/, `DIRECTORY=${walletPath})))`);
+    fs.writeFileSync(pathPropiedades, contenido, 'utf8');
   } catch (err) {
     console.error('Error al modificar el archivo de propiedades:', err);
   }
 
-  const sqlNetOraPath = path.join(walletPath, 'sqlnet.ora');
+  const pathSQLNetOra = path.join(walletPath, 'sqlnet.ora');
 
   try {
-    let sqlNetOraContent = fs.readFileSync(sqlNetOraPath, 'utf8');
-    sqlNetOraContent = sqlNetOraContent.replace(/DIRECTORY\s*=\s*.+\)/, `DIRECTORY = ${walletPath})))`);
-    fs.writeFileSync(sqlNetOraPath, sqlNetOraContent, 'utf8');
+    let contenido = fs.readFileSync(pathSQLNetOra, 'utf8');
+    contenido = contenido.replace(/DIRECTORY\s*=\s*.+\)/, `DIRECTORY = ${walletPath})))`);
+    fs.writeFileSync(pathSQLNetOra, contenido, 'utf8');
   } catch (err) {
     console.error('Error al modificar sqlnet.ora:', err);
   }
 }
 
-async function connectToDatabase() {
+async function conectarDB() {
   try {
     connection = await oracledb.getConnection({
-      user: 'USUARIO',
-      password: 'PASSWORD',
-      connectString: 'STRING PARA CONEXION CON ORACLE (VIENE CON LA WALLET DE DESCARGA, USANDO TNS PUEDE SER CUALQUIERA HIGH,MEDIUM,LOW)',
+      user: '',
+      password: '',
+      connectString: '',
     });
   } catch (err) {
     console.error('Error al conectar a la base de datos:', err);
   }
 }
 
-async function executeQuery(query, params) {
+async function executeSelect(query, params) {
   if (connection) {
     try {
       const result = await connection.execute(query, params, { outFormat: oracledb.OUT_FORMAT_OBJECT });
 
-      // Procesa los LOBs
       const processedRows = await Promise.all(result.rows.map(async (row) => {
         for (const key in row) {
           if (row[key] instanceof oracledb.Lob) {
@@ -137,7 +136,7 @@ async function executeInsert(query, params) {
 
 ipcMain.handle('select-database', async (event, query, params) => {
   try {
-    return await executeQuery(query, params);
+    return await executeSelect(query, params);
   } catch (err) {
     return { error: err.message };
   }
@@ -173,26 +172,29 @@ ipcMain.handle('generate-excel', async (event, nombresPartida, nombresLlegada, d
       row.push(parseInt(distancias[i][j]));
     });
     worksheet.addRow(row);
-  });
+  }); 
 
+  return guardarArchivoYObtenerPath(workbook);
+});
+
+async function guardarArchivoYObtenerPath(workbook) {
   let index = 0;
   let filePath = '';
 
   while (true) {
+    // Verifica si hay un archivo, en caso de no existir con el mismo nombre lo guarda, sino itera y devuelve 'distancias(n).xlsx'
     const archivo = index === 0 ? '' : `(${index})`;
     filePath = path.join(app.getPath('downloads'), `distancias${archivo}.xlsx`);
 
     if (!fs.existsSync(filePath)) {
       try {
         await workbook.xlsx.writeFile(filePath);
-        break;
+        return filePath;
       } catch (error) {
         console.error('Error al guardar el archivo:', error);
-        throw error; 
+        throw error;
       }
     }
     index++;
   }
-
-  return filePath;
-});
+}

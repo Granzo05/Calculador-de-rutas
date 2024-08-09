@@ -9,13 +9,13 @@
 </head>
 
 <body>
-    <div class="ayuda" id="div-ayuda">
+    <div class="help" id="div-help">
         <p>Ayuda</p>
         <img
             src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAAC7klEQVR4nO2av2sUQRTHPyC4CWJIQBNB0PwDdlpFBEESBCWxkZg0grUYgpLGWr2LiJJAsLFIYSNYRE8NNmoVxMLKu/wAxdNCIjYiJJ5mZeAtDMfc3t7OzN4a8oUvHOzce/vdffPmzZuFHWxf9AAjwDRQAirAD2BTqH6X5ZoaMwx0kxMEwDiwCPwBwhap/vMcGBNbmaMTmAS+prj5RvwCTAAdWYk4Daw5FFDPVWDIpwD16u95FFDPeXnzTtEHvMtQRCh8C/S6EtEvrztsE1fkHqywX9Jo2GauAQfSiuhoUziFMWGWKkXP5eDmwzrOpEmxtk5/yWKnMt0t4IGs7LZ2B5OK6LRcJ9RqfSOm/DgOvLec/EESIZMWTmrAuYQP65WFnyvNHASWZYcKIR0nJa7n5QHt0a6pLPQzpZ9qs7cybjknVAUc4aphjErlex0llAtxQhYtDKvyPMIhCTPTuClt3HkLf88aiehJWYpHfCMZ5SBwLWbcQ83nCQt/NaDLJGTEwmjatWDY0tZZk5DbGYj4CxzTfBYt7RVNQkoZCJnV/KkM9s3S3oJJyIpnEZ/qYrrgwGbFJOS7RxFqYg5ovgYsE0soXDcJ2fQo5LrmR5UuHx3Z3chSyGtgl+bnkUPbG1mFlgqfI5qPS47tr5uELHsQUqpbcF0/rLJJyFMPQu5o9oc82F8wCZn24OimZv+iB/sFkxDbcsHEx8Ap4YwH+2dMQrod5fas+LtR0ajwIgc3GCakmtMNMebY2RPZf0xJ88Gl7dE4IYF0xV05UzvOCEcd2q0Cu2mCif9AyGUSdhhXcyyk0krH0dXipbYGL4U2vaxQuCWpvCXMOgwFV7xLCgTSOA5zwqUkE7wR9uXoWKEPS/RnsA2O4zJwGEfobVOYLclhk5fD0K2MRNz3ffY+6DnUKmlSbFoE0tqvOhTwWVbstnwBEUhXvBTTtI5jTarYUZvU6hpd0ostStVblj169FGN+v1BtqcF2RTpRww72Fb4B9AyEV20mbQXAAAAAElFTkSuQmCC">
     </div>
 
-    <div class="ayuda" id="div-cerrar" style="display: none;">
+    <div class="help" id="div-cerrar" style="display: none;">
         <p>Cerrar</p>
         <img
             src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAYAAAAeP4ixAAAACXBIWXMAAAsTAAALEwEAmpwYAAAB/ElEQVR4nO2au0oDQRSGP7RYAxYiirWgD6CgW1gqqKAvoT6E8QVyKYyl2mujhb6AsdBeREyRShAEi4hiY4wXFiJITLJnZ2dmxyU/TLfznznLtztnzyz01JNVlYGvLuMJ8A3E9Zve3WIHaxPrKsQsGFVgUGMSgVdVEDdYm1jTQF1guqcxkX1BvAYwG9U4LzAOxqqGJJaAT0GsnIq5B9wIzB+BsRhJjAIPgjgVYCDOw9cQBDmNkcixwP8DmCOmpIitK3hvCL1zaJAUsVdgMoLvOPBiGilVxC6BfsLVB5zbQkoVsSzh2rKJlCpi78AMnTUFvNlGShWxWyDT4WZcJ4VUqwpCLEp/ZsKOcG4eC5IiFuzUy7/mLQh374pJpFQRuweGgSHgzhWkVBE7bA7JtQUSkBQx6bCKlCpiTiKliljibynTiCWKlC7EnEBKB2JOINWqokIiibxuU4+Wp+Fhb1dg/guknEPMT8OG6BkoUTIuI3XgctHop6GM9yJ8WAWt0B/NNxfqDGJFISbbbeaWXEHMT0PzwRMiVdfYDsokWRRuCryySRWVvhCpC5dbpl6EJvZExCb2s03ECkIM1hS8120h5guROokR48g0Yp6lo7eRCEdvGZNIrRBfi8J2at4UUrvoU3DUrR2x1PwwUA4xqxn8haMWEvvMQNyeeqKDvgGmxjw+5jmxEQAAAABJRU5ErkJggg==">
@@ -142,17 +142,18 @@
 
     <div class="container" id="container-app">
         <p style="font-size: 32px; text-decoration: underline;">Puntos de partida</p>
+        <button class="black-button" onclick="limpiarInputsDePartida()">Limpiar puntos de partida</button>
         <div id="inputs-container-partida">
             <span class="inputs-container">
                 <input type="text" class="nombre"
-                    oninput="buscarDatos(this, 'inputs-container-partida'); handleInput(this, 'inputs-container-partida')"
+                    oninput="getDatosGuardadosLikeInputValue(this, 'inputs-container-partida'); añadirCamposSiguientes(this, 'inputs-container-partida')"
                     placeholder="Nombre o número..." />
                 <div class="results-container" id="results-container-partida-1"></div>
                 <input type="text" class="latitud-input"
-                    oninput="handleLatLongInput(this); handleInput(this, 'inputs-container-partida')"
+                    oninput="autocompletarPegado(this); añadirCamposSiguientes(this, 'inputs-container-partida')"
                     placeholder="Latitud..." />
-                <input type="text" class="longitud-input" oninput="handleInput(this, 'inputs-container-partida')"
-                    placeholder="Longitud..." />
+                <input type="text" class="longitud-input"
+                    oninput="añadirCamposSiguientes(this, 'inputs-container-partida')" placeholder="Longitud..." />
             </span>
         </div>
         <button class="gray-button" id="button-partida">Crear punto de partida nuevo</button>
@@ -160,17 +161,18 @@
             <hr>
         </div>
         <p style="font-size: 32px; text-decoration: underline;">Puntos de llegada</p>
+        <button class="black-button" onclick="limpiarInputsDeLlegada()">Limpiar puntos de llegada</button>
         <div id="inputs-container-llegada">
             <span class="inputs-container">
                 <input type="text" class="nombre"
-                    oninput="buscarDatos(this, 'inputs-container-llegada'); handleInput(this, 'inputs-container-llegada')"
+                    oninput="getDatosGuardadosLikeInputValue(this, 'inputs-container-llegada'); añadirCamposSiguientes(this, 'inputs-container-llegada')"
                     placeholder="Nombre o número..." />
                 <div class="results-container" id="results-container-llegada-1"></div>
                 <input type="text" class="latitud-input"
-                    oninput="handleLatLongInput(this); handleInput(this, 'inputs-container-llegada')"
+                    oninput="autocompletarPegado(this); añadirCamposSiguientes(this, 'inputs-container-llegada')"
                     placeholder="Latitud..." />
-                <input type="text" class="longitud-input" oninput="handleInput(this, 'inputs-container-llegada')"
-                    placeholder="Longitud..." />
+                <input type="text" class="longitud-input"
+                    oninput="añadirCamposSiguientes(this, 'inputs-container-llegada')" placeholder="Longitud..." />
             </span>
         </div>
         <button class="gray-button" id="button-llegada">Crear punto de llegada nuevo</button>
@@ -186,7 +188,7 @@
         </div>
     </div>
 
-    <button class="black-button" id="button" onclick="calcularDistancia()">Calcular distancia</button>
+    <button class="black-button" id="button" onclick="calculardiferenciaMedianteHaversine()">Calcular distancia</button>
 
     <script src="./script.js"></script>
 </body>
