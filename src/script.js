@@ -190,7 +190,7 @@ document.getElementById('div-help').addEventListener('click', (event) => {
 });
 
 function mostrarDatosDeAyudaAlClickear() {
-    document.getElementById('div-ayuda').style.display = 'none';
+    document.getElementById('div-help').style.display = 'none';
     document.getElementById('container-app').style.display = 'none';
     document.getElementById('button').style.display = 'none';
 
@@ -203,7 +203,7 @@ document.getElementById('div-cerrar').addEventListener('click', (event) => {
 });
 
 function ocultarDatosDeAyudaAlCerrar() {
-    document.getElementById('div-ayuda').style.display = 'flex';
+    document.getElementById('div-help').style.display = 'flex';
     document.getElementById('container-app').style.display = 'flex';
     document.getElementById('button').style.display = 'block';
 
